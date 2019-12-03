@@ -24,6 +24,7 @@ class Player():
         self.f2_on = 0
         self.x = 400
         self.y = 325
+
         #self.color = choice(['blue', 'green', 'yellow', 'brown'])
         self.a1 = 40
         self.a2 = 20
@@ -64,12 +65,11 @@ class Player():
         )
     
     
-    
     def move_right(self, event):            
         self.x += self.vx
         self.set_coords1()
         self.set_coords2()
-        
+
         
     def move_left(self, event):
         self.x -= self.vx
@@ -87,13 +87,14 @@ class Player():
         self.y += self.vy
         self.set_coords1()
         self.set_coords2()
-        
+
         
 def game_process(event=''):
     
     
     root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
+    root.bind('<Shift-Up>', foo)
     root.bind('<Up>', P1.move_up)
     root.bind('<Down>', P1.move_down)
     
@@ -102,6 +103,7 @@ def game_process(event=''):
 create_objects()
          
 P1 = Player()
+P1.update()
 
 game_process()
 
