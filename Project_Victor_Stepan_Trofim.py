@@ -47,24 +47,25 @@ class Player():
         )
     
     
-    def move_right(self):            
+    def move_right(self, event):            
         self.x += self.vx
         self.set_coords()
         
         
-    def move_left(self):
+    def move_left(self, event):
         self.x -= self.vx
         self.set_coords()
         
         
-    def move_up(self):
-        self.y -= self.y
+    def move_up(self, event):
+        self.y -= self.vy
         self.set_coords()
         
         
-    def move_down(self):
-        self.x += self.vx
+    def move_down(self, event):
+        self.y += self.vy
         self.set_coords()
+    
             
             
 def game_process(event=''):
