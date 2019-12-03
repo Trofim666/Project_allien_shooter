@@ -23,7 +23,7 @@ class Player():
         
         self.x = 400
         self.y = 325
-        self.color = choice(['blue', 'green', 'red', 'brown'])
+        self.color = choice(['blue', 'green', 'yellow', 'brown'])
         self.a = 20
         self.vx = 10
         self.vy = 10
@@ -36,6 +36,9 @@ class Player():
                 fill=self.color
         )
         
+        self.moving_right = False
+        self.moving_up = False
+        
         
     def set_coords(self):
         canv.coords(
@@ -47,31 +50,47 @@ class Player():
         )
     
     
-    def move_right(self):            
-        self.x += self.vx
-        self.set_coords()
+    def move_right(self, event):  
+        self.moving_right = True  
+        # self.x += self.vx
+        # self.set_coords()
         
         
-    def move_left(self):
+    def move_left(self, event):
         self.x -= self.vx
         self.set_coords()
         
         
-    def move_up(self):
-        self.y -= self.y
-        self.set_coords()
+    def move_up(self, event):
+        self.moving_up = True
+        # self.y -= self.vy
+        # self.set_coords()
         
         
-    def move_down(self):
-        self.x += self.vx
+    def move_down(self, event):
+        self.y += self.vy
         self.set_coords()
+    
+    def update(self):
+        if self.moving_right:
+            self.x += self.vx
+        if self.moving_up:
+            self.y -= self.vy
+        self.set_coords()
+        root.after(100, self.update)
             
             
+
+def foo(x):
+    print('!')
+
+           
 def game_process(event=''):
     
     
     root.bind('<Right>', P1.move_right)
     root.bind('<Left>', P1.move_left)
+    root.bind('<Shift-Up>', foo)
     root.bind('<Up>', P1.move_up)
     root.bind('<Down>', P1.move_down)
     
@@ -80,6 +99,7 @@ def game_process(event=''):
 create_objects()
          
 P1 = Player()
+P1.update()
 
 game_process()
 
