@@ -19,58 +19,80 @@ def create_objects():
     
 class Player():
     
-    def __init__(self):
+    def __init__(self, ):
         
+        self.f2_on = 0
         self.x = 400
         self.y = 325
-        self.color = choice(['blue', 'green', 'red', 'brown'])
-        self.a = 20
+        #self.color = choice(['blue', 'green', 'yellow', 'brown'])
+        self.a1 = 40
+        self.a2 = 20
         self.vx = 10
         self.vy = 10
         
-        self.id = canv.create_rectangle(
-                self.x - self.a,
-                self.y - self.a,
-                self.x + self.a,
-                self.y + self.a,
-                fill=self.color
+        self.id1 = canv.create_oval(
+                self.x - self.a1,
+                self.y - self.a2,
+                self.x + self.a1,
+                self.y + self.a2,
+                fill='blue'
+        )
+        self.id2 = canv.create_oval(
+                self.x - self.a2,
+                self.y - self.a2,
+                self.x + self.a2,
+                self.y + self.a2,
+                fill='yellow'
         )
         
-        
-    def set_coords(self):
+    def set_coords2(self):
         canv.coords(
-            self.id,
-            self.x - self.a,
-            self.y - self.a,
-            self.x + self.a,
-            self.y + self.a
+            self.id2,
+            self.x - self.a2,
+            self.y - self.a2,
+            self.x + self.a2,
+            self.y + self.a2
+        )
+    
+    def set_coords1(self):
+        canv.coords(
+            self.id1,
+            self.x - self.a1,
+            self.y - self.a2,
+            self.x + self.a1,
+            self.y + self.a2
         )
     
     
-    def move_right(self):            
+    
+    def move_right(self, event):            
         self.x += self.vx
-        self.set_coords()
+        self.set_coords1()
+        self.set_coords2()
         
         
-    def move_left(self):
+    def move_left(self, event):
         self.x -= self.vx
-        self.set_coords()
+        self.set_coords1()
+        self.set_coords2()
         
         
-    def move_up(self):
-        self.y -= self.y
-        self.set_coords()
+    def move_up(self, event):
+        self.y -= self.vy
+        self.set_coords1()
+        self.set_coords2()
         
         
-    def move_down(self):
-        self.x += self.vx
-        self.set_coords()
-            
-            
+    def move_down(self, event):
+        self.y += self.vy
+        self.set_coords1()
+        self.set_coords2()
+        
+        
 def game_process(event=''):
     
     
-    root.bind('<Right>', P1.move_right)
+    root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
     root.bind('<Up>', P1.move_up)
     root.bind('<Down>', P1.move_down)
