@@ -128,7 +128,7 @@ class Player():
         new_ball.vy = - self.f2_power * math.sin(self.an)
         balls += [new_ball]
         self.f2_on = 0
-        self.f2_power = 20
+
         
         
     def targetting(self, event=0):
@@ -148,9 +148,18 @@ class Player():
     
     def move_right(self, event):  
         global k_x, k_y
-          
-        self.x += k_x*self.vx
-        self.y += -k_y*self.vy
+        if self.an>0 and self.an<math.pi/2:
+            self.x += -k_x*self.vx
+            self.y += k_y*self.vy
+        if self.an<0 and self.an>-math.pi/2:
+            self.x += k_x*self.vx
+            self.y += -k_y*self.vy
+        if self.an>math.pi/2 and self.an<math.pi:
+            self.x += k_x*self.vx
+            self.y += -k_y*self.vy
+        if self.an>-math.pi and self.an<-math.pi/2:
+            self.x += -k_x*self.vx
+            self.y += k_y*self.vy
         
         self.set_coords1()
         self.set_coords2()
@@ -159,9 +168,18 @@ class Player():
         
     def move_left(self, event):
         global k_x, k_y
-        
-        self.x += -k_x*self.vx
-        self.y += k_y*self.vy
+        if self.an>0 and self.an<math.pi/2:
+            self.x += k_x*self.vx
+            self.y += -k_y*self.vy
+        if self.an<0 and self.an>-math.pi/2:
+            self.x += -k_x*self.vx
+            self.y += k_y*self.vy
+        if self.an>math.pi/2 and self.an<math.pi:
+            self.x += -k_x*self.vx
+            self.y += k_y*self.vy
+        if self.an>-math.pi and self.an<-math.pi/2:
+            self.x += k_x*self.vx
+            self.y += -k_y*self.vy
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
