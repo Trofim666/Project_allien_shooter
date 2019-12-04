@@ -148,19 +148,8 @@ class Player():
     
     def move_right(self, event):  
         global k_x, k_y
-        if self.an>=0 and self.an<math.pi/2:
-            self.x += -k_y*self.vx
-            self.y += k_x*self.vy
-        if self.an<0 and self.an>=-math.pi/2:
-            self.x += k_y*self.vx
-            self.y += -k_x*self.vy
-        if self.an>=math.pi/2 and self.an<=math.pi:
-            self.x += k_y*self.vx
-            self.y += -k_x*self.vy
-        if self.an>=-math.pi and self.an<-math.pi/2:
-            self.x += -k_y*self.vx
-            self.y += k_x*self.vy
-        
+        self.x += -k_y*self.vx
+        self.y += k_x*self.vy
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -168,18 +157,8 @@ class Player():
         
     def move_left(self, event):
         global k_x, k_y
-        if self.an>=0 and self.an<math.pi/2:
-            self.x += k_y*self.vx
-            self.y += -k_x*self.vy
-        if self.an<0 and self.an>=-math.pi/2:
-            self.x += -k_y*self.vx
-            self.y += k_x*self.vy
-        if self.an>=math.pi/2 and self.an<=math.pi:
-            self.x += -k_y*self.vx
-            self.y += k_x*self.vy
-        if self.an>=-math.pi and self.an<-math.pi/2:
-            self.x += k_y*self.vx
-            self.y += -k_x*self.vy
+        self.x += k_y*self.vx
+        self.y += -k_x*self.vy
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
