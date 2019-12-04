@@ -9,7 +9,8 @@ fr = tk.Frame(root)
 root.geometry('800x650')
 canv = tk.Canvas(root, bg='pink')
 canv.pack(fill=tk.BOTH, expand=1)
-
+k_x = 1
+k_y = 1
 
 def create_objects():
     canv.create_oval (100, 25, 700, 625, outline="gray", fill="red", width=2)
@@ -102,12 +103,14 @@ class Player():
     
     
     def set_coords3(self):
+        global k_x, k_y
+        
         canv.coords(
             self.id3,
             self.x,
             self.y,
-            self.x,
-            self.y - self.l
+            self.x + self.l*k_x,
+            self.y + self.l*k_y
         )
 
 
@@ -130,37 +133,53 @@ class Player():
         
     def targetting(self, event=0):
         """Прицеливание. Зависит от положения мыши."""
+        global k_x, k_y
+        
         if event:
-            self.an = math.atan2((event.y-self.y), (event.x-self.x))
-        canv.coords(self.id3, 
+            self.an = math.atan2((event.y-self.y) , (event.x-self.x))
+            canv.coords(self.id3, 
                     self.x, 
                     self.y,
                     self.x + self.l*math.cos(self.an),
                     self.y + self.l*math.sin(self.an)
                     )
+        k_x = math.cos(self.an)
+        k_y = math.sin(self.an)
     
-    
-    def move_right(self, event):            
-        self.x += self.vx
+    def move_right(self, event):  
+        global k_x, k_y
+          
+        self.x += k_x*self.vx
+        self.y += -k_y*self.vy
+        
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
         
         
     def move_left(self, event):
-        self.x -= self.vx
+        global k_x, k_y
+        
+        self.x += -k_x*self.vx
+        self.y += k_y*self.vy
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
         
     def move_up(self, event):
-        self.y -= self.vy
+        global k_x, k_y
+        
+        self.x += k_x*self.vx
+        self.y += k_y*self.vy
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
         
     def move_down(self, event):
-        self.y += self.vy
+        global k_x, k_y
+        
+        self.x += -k_x*self.vx
+        self.y += -k_y*self.vy
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -182,7 +201,7 @@ def game_process(event=''):
     canv.update()
     time.sleep(0.03)
     P1.targetting()
-    root.after(750, game_process)
+    root.after(20, game_process)
     
 create_objects()
          
