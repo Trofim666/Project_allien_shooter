@@ -13,7 +13,7 @@ k_x = 1
 k_y = 1
 M = 1
 dt = 0.01
-w = 0.1
+w = 5
 
 
 def create_objects():
@@ -75,8 +75,8 @@ class Player():
         #self.color = choice(['blue', 'green', 'yellow', 'brown'])
         self.a1 = 30
         self.a2 = 15
-        self.vx = 3
-        self.vy = 0
+        self.vx = 0
+        self.vy = 1
         self.v = math.sqrt(self.vx**2 + self.vy**2)
         self.l = 50
         self.id1 = canv.create_oval(
@@ -168,16 +168,16 @@ class Player():
         #cosa =(self.x-self.xc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2  ) 
         #self.ax = self.F*k_x/self.m + k_x * 2*w*self.vy + w**2*(self.x-self.xc)
         #self.ay = self.F*k_y/self.m + k_y * 2*w*self.vx + w**2*(self.y-self.yc)
-        self.ax =  k_x * 2*w*self.vy + w**2*(self.x-self.xc)
-        self.ay = k_y * 2*w*self.vx + w**2*(self.y-self.yc)
+        self.ax =  k_x * 2*w*self.vy + (w**2)*(self.x-self.xc)
+        self.ay = k_y * 2*w*self.vx + (w**2)*(self.y-self.yc)
         self.vx +=self.ax*dt 
         self.vy +=self.ay*dt
     def move(self):
         global k_x, k_y
         #self.x += -k_y*self.v
         #self.y += k_x*self.v
-        self.x+=self.vx
-        self.y+=self.vy
+        self.x+=self.vx*0.001
+        self.y+=self.vy*0.001
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -235,7 +235,7 @@ def game_process(event=''):
     P1.move()
     P1.acceleration()
     P1.targetting()
-    time.sleep(0.03)
+    #time.sleep(0.03)
     
     root.after(20, game_process)
     
