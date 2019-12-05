@@ -76,7 +76,7 @@ class Player():
         self.a1 = 30
         self.a2 = 15
         self.vx = 0
-        self.vy = 1
+        self.vy = 5
         self.v = math.sqrt(self.vx**2 + self.vy**2)
         self.l = 50
         self.id1 = canv.create_oval(
