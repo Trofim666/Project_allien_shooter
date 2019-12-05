@@ -13,7 +13,7 @@ k_x = 1
 k_y = 1
 M = 1
 dt = 0.01
-w = 0.01
+w = 0.1
 
 
 def create_objects():
@@ -75,8 +75,8 @@ class Player():
         #self.color = choice(['blue', 'green', 'yellow', 'brown'])
         self.a1 = 30
         self.a2 = 15
-        self.vx = 1
-        self.vy = 1
+        self.vx = 3
+        self.vy = 0
         self.v = math.sqrt(self.vx**2 + self.vy**2)
         self.l = 50
         self.id1 = canv.create_oval(
