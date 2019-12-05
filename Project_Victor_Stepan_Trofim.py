@@ -11,6 +11,10 @@ canv = tk.Canvas(root, bg='pink')
 canv.pack(fill=tk.BOTH, expand=1)
 k_x = 1
 k_y = 1
+M = 1
+dt = 0.01
+w = 0.01
+
 
 def create_objects():
     canv.create_oval (100, 25, 700, 625, outline="gray", fill="red", width=2)
@@ -58,12 +62,22 @@ class Player():
         self.f2_on = 0
         self.x = 400
         self.y = 325
+        
+        
+        self.ay = 0
+        self.ax = 0
+        self.xc = 400
+        self.yc = 325
+        self.m = 10
+        self.F = self.m*M*0.1
+        
         self.an = 1
         #self.color = choice(['blue', 'green', 'yellow', 'brown'])
         self.a1 = 30
         self.a2 = 15
-        self.vx = 10
-        self.vy = 10
+        self.vx = 1
+        self.vy = 1
+        self.v = math.sqrt(self.vx**2 + self.vy**2)
         self.l = 50
         self.id1 = canv.create_oval(
                 self.x - self.a1,
@@ -145,11 +159,32 @@ class Player():
                     )
         k_x = math.cos(self.an)
         k_y = math.sin(self.an)
-    
+        
+        
+        
+    def acceleration(self, event=0):
+        global k_x, k_y
+        #sina = (self.y-self.yc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2   )
+        #cosa =(self.x-self.xc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2  ) 
+        #self.ax = self.F*k_x/self.m + k_x * 2*w*self.vy + w**2*(self.x-self.xc)
+        #self.ay = self.F*k_y/self.m + k_y * 2*w*self.vx + w**2*(self.y-self.yc)
+        self.ax =  k_x * 2*w*self.vy + w**2*(self.x-self.xc)
+        self.ay = k_y * 2*w*self.vx + w**2*(self.y-self.yc)
+        self.vx +=self.ax*dt 
+        self.vy +=self.ay*dt
+    def move(self):
+        global k_x, k_y
+        #self.x += -k_y*self.v
+        #self.y += k_x*self.v
+        self.x+=self.vx
+        self.y+=self.vy
+        self.set_coords1()
+        self.set_coords2()
+        self.set_coords3()
     def move_right(self, event):  
         global k_x, k_y
-        self.x += -k_y*self.vx
-        self.y += k_x*self.vy
+        self.x += -k_y*self.v
+        self.y += k_x*self.v
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -157,17 +192,18 @@ class Player():
         
     def move_left(self, event):
         global k_x, k_y
-        self.x += k_y*self.vx
-        self.y += -k_x*self.vy
+        self.x += k_y*self.v
+        self.y += -k_x*self.v
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
         
     def move_up(self, event):
         global k_x, k_y
-        
-        self.x += k_x*self.vx
-        self.y += k_y*self.vy
+        self.vx+=self.F*k_x/self.m
+        self.vy+=self.F*k_y/self.m
+        #self.x += k_x*self.v
+        #self.y += k_y*self.v
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -175,8 +211,8 @@ class Player():
     def move_down(self, event):
         global k_x, k_y
         
-        self.x += -k_x*self.vx
-        self.y += -k_y*self.vy
+        self.x += -k_x*self.v
+        self.y += -k_y*self.v
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -196,8 +232,11 @@ def game_process(event=''):
     for b in balls:
             b.move()
     canv.update()
-    time.sleep(0.03)
+    P1.move()
+    P1.acceleration()
     P1.targetting()
+    time.sleep(0.03)
+    
     root.after(20, game_process)
     
 create_objects()
