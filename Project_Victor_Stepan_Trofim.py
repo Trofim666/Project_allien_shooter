@@ -12,8 +12,8 @@ canv.pack(fill=tk.BOTH, expand=1)
 k_x = 1
 k_y = 1
 M = 1
-dt = 0.01
-w = 5
+dt = 1
+w = 0.01
 
 
 def create_objects():
@@ -60,7 +60,7 @@ class Player():
     def __init__(self, ):
         self.f2_power = 20
         self.f2_on = 0
-        self.x = 400
+        self.x = 500
         self.y = 325
         
         
@@ -76,7 +76,7 @@ class Player():
         self.a1 = 30
         self.a2 = 15
         self.vx = 0
-        self.vy = 5
+        self.vy = w*(self.x-self.xc)
         self.v = math.sqrt(self.vx**2 + self.vy**2)
         self.l = 50
         self.id1 = canv.create_oval(
@@ -162,22 +162,25 @@ class Player():
         
         
         
-    def acceleration(self, event=0):
+    def acceleration(self):
         global k_x, k_y
         #sina = (self.y-self.yc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2   )
         #cosa =(self.x-self.xc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2  ) 
         #self.ax = self.F*k_x/self.m + k_x * 2*w*self.vy + w**2*(self.x-self.xc)
         #self.ay = self.F*k_y/self.m + k_y * 2*w*self.vx + w**2*(self.y-self.yc)
-        self.ax =  k_x * 2*w*self.vy + (w**2)*(self.x-self.xc)
-        self.ay = k_y * 2*w*self.vx + (w**2)*(self.y-self.yc)
+        self.ax =  -2*w*self.vy + (w**2)*(self.x-self.xc)
+        self.ay =  2*w*self.vx +(w**2)*(self.y-self.yc)
+        #self.ax = -(w**2)*(self.x-self.xc)
+        #self.ay = -(w**2)*(self.y-self.yc)
         self.vx +=self.ax*dt 
         self.vy +=self.ay*dt
+        self.v = math.sqrt(self.vx**2 + self.vy**2)
     def move(self):
         global k_x, k_y
         #self.x += -k_y*self.v
         #self.y += k_x*self.v
-        self.x+=self.vx*0.001
-        self.y+=self.vy*0.001
+        self.x+=self.vx
+        self.y+=self.vy
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -237,7 +240,7 @@ def game_process(event=''):
     P1.targetting()
     #time.sleep(0.03)
     
-    root.after(20, game_process)
+    root.after(1, game_process)
     
 create_objects()
          
