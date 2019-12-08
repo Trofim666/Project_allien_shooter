@@ -38,7 +38,7 @@ class Ball():
         self.x = x
         self.y = y
         self.r = 2
-        self.live = 200
+        self.live = 20
         self.vx = 40
         self.vy = 40
         self.color = choice(['blue', 'green', 'red', 'brown'])
