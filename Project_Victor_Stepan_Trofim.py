@@ -2,7 +2,8 @@ from random import randrange as rnd, choice
 import tkinter as tk
 import math
 import time
-
+import graphics as gr
+from math import sqrt
 
 root = tk.Tk()
 fr = tk.Frame(root)
@@ -11,15 +12,24 @@ canv = tk.Canvas(root, bg='pink')
 canv.pack(fill=tk.BOTH, expand=1)
 k_x = 1
 k_y = 1
+
+i=0
+k=0
+x_0 = 100
+y_0 = 25
+R = 300
+a = 200
+enemys=[]
+
 M = 1
 dt = 1
 w = 0.001
 
 
+
 def create_objects():
-    canv.create_oval (100, 25, 700, 625, outline="gray", fill="red", width=2)
-    a = 5
-    canv.create_oval (400-a, 325-a, 400+a, 325+a, fill="blue", width=2)
+    canv.create_oval (x_0, y_0, x_0 + 2*R, y_0 + 2*R, outline="gray", fill="red", width=2)
+    canv.create_oval (x_0 + R-a, y_0 + R-a, x_0 + R + a, y_0 + R+a, fill="white", width=2)
 
 
 class Ball():
@@ -219,6 +229,94 @@ class Player():
         self.set_coords2()
         self.set_coords3()
 
+
+def get_r_vector(x,y):
+    length_vector = sqrt(((x_0 + R)-x)**2 + ((y_0 + R)-y)**2)
+    radius_vector = gr.Point(((x_0 + R)-x) / length_vector, ((y_0 + R)-y) / length_vector)
+    return radius_vector
+
+
+def get_normal(x,y):
+    length_vector = sqrt(((x_0 + R)-x)**2 + ((y_0 + R)-y)**2)
+    normal_vector = gr.Point(((y_0 + R)-y) / length_vector, -((x_0 + R)-x) / length_vector)
+    return normal_vector
+
+
+def scalar_multiplication(vector_1, vector_2):
+    scalar = vector_1.x*vector_2.x + vector_1.y*vector_2.y
+    return scalar
+
+
+def change_velocity_vx(vx, vy, x, y):
+    velocity=gr.Point(vx, vy)
+    vel_normal_0 = gr.Point(get_r_vector(x,y).x 
+                            * scalar_multiplication(get_r_vector(x,y),velocity), 
+                            get_r_vector(x,y).y 
+                            * scalar_multiplication(get_r_vector(x,y),velocity)
+    )
+    vel_tau = gr.Point(get_normal(x,y).x 
+                       * scalar_multiplication(get_normal(x,y),velocity), 
+                       get_normal(x,y).y 
+                       * scalar_multiplication(get_normal(x,y),velocity)
+    )
+    vel_normal_1 = gr.Point(-vel_normal_0.x,-vel_normal_0.y)
+    i = gr.Point(1, 0)
+
+    vel_1_x = scalar_multiplication(vel_normal_1, i)
+    vel_2_x = scalar_multiplication(vel_tau, i)
+    
+    vx = vel_1_x + vel_2_x
+    
+    return vx
+
+
+def change_velocity_vy(vx, vy, x, y):
+    velocity=gr.Point(vx, vy)
+    vel_normal_0 = gr.Point(get_r_vector(x,y).x 
+                            * scalar_multiplication(get_r_vector(x,y),velocity), 
+                            get_r_vector(x,y).y 
+                            * scalar_multiplication(get_r_vector(x,y),velocity)
+    )
+    vel_tau = gr.Point(get_normal(x,y).x 
+                       * scalar_multiplication(get_normal(x,y),velocity), 
+                       get_normal(x,y).y 
+                       * scalar_multiplication(get_normal(x,y),velocity)
+    )
+    vel_normal_1 = gr.Point(-vel_normal_0.x,-vel_normal_0.y)
+    j = gr.Point(0, 1)
+    
+    vel_1_y = scalar_multiplication(vel_normal_1, j)
+    vel_2_y = scalar_multiplication(vel_tau, j)
+    
+    vy = vel_1_y + vel_2_y
+    
+    return vy
+
+
+def new_enemy():
+    x = rnd(100,700)
+    y = rnd(100,500)
+    r = rnd(10,15)
+    vx=rnd(-4, 4)
+    vy=rnd(-4, 4)
+    if (x - (x_0 + R))**2 + (y - (y_0 + R))**2 >= a**2 and (x - (x_0 + R))**2 + (y - (y_0 + R))**2 <= (R-40)**2 :
+        id_ = canv.create_oval( x - r, y - r, x + r, y + r,fill = 'black', width=0)
+        enemy={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy}
+        enemys.append(enemy)
+    root.after(600,new_enemy)
+
+def motion():
+    for e in enemys:
+        if (x_0 + R - e['x'])**2 + (y_0 + R - e['y'])**2 >= (R)**2:
+            e['vx'] = change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
+            e['vy'] = change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
+        e['x']+=e['vx']
+        e['y']+=e['vy']
+        canv.move(e['id'], e['vx'], e['vy'])
+    root.after(10, motion)
+
+
+
 balls = []
 bullet = 0
 
@@ -250,7 +348,8 @@ create_objects()
 P1 = Player()
 
 game_process()
-
+new_enemy()
+motion()
 
 
 root.mainloop()
