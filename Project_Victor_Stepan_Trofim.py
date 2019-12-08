@@ -13,7 +13,7 @@ k_x = 1
 k_y = 1
 M = 1
 dt = 1
-w = 0.01
+w = 0.001
 
 
 def create_objects():
@@ -28,6 +28,7 @@ class Ball():
         self.x = x
         self.y = y
         self.r = 2
+        self.live = 200
         self.vx = 40
         self.vy = 40
         self.color = choice(['blue', 'green', 'red', 'brown'])
@@ -60,7 +61,7 @@ class Player():
     def __init__(self, ):
         self.f2_power = 20
         self.f2_on = 0
-        self.x = 500
+        self.x = 400
         self.y = 325
         
         
@@ -76,7 +77,7 @@ class Player():
         self.a1 = 30
         self.a2 = 15
         self.vx = 0
-        self.vy = w*(self.x-self.xc)
+        self.vy = 0
         self.v = math.sqrt(self.vx**2 + self.vy**2)
         self.l = 50
         self.id1 = canv.create_oval(
@@ -170,8 +171,6 @@ class Player():
         #self.ay = self.F*k_y/self.m + k_y * 2*w*self.vx + w**2*(self.y-self.yc)
         self.ax =  -2*w*self.vy + (w**2)*(self.x-self.xc)
         self.ay =  2*w*self.vx +(w**2)*(self.y-self.yc)
-        #self.ax = -(w**2)*(self.x-self.xc)
-        #self.ay = -(w**2)*(self.y-self.yc)
         self.vx +=self.ax*dt 
         self.vy +=self.ay*dt
         self.v = math.sqrt(self.vx**2 + self.vy**2)
@@ -179,8 +178,8 @@ class Player():
         global k_x, k_y
         #self.x += -k_y*self.v
         #self.y += k_x*self.v
-        self.x+=self.vx
-        self.y+=self.vy
+        self.x+=self.vx#*0.1
+        self.y+=self.vy#*0.1
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -232,13 +231,17 @@ def game_process(event=''):
     root.bind('<Left>', P1.move_left)
     root.bind('<Up>', P1.move_up)
     root.bind('<Down>', P1.move_down)
+    delete = []
     for b in balls:
             b.move()
+            b.live+= -1
+            if b.live<=0:
+                canv.delete(b.id)
     canv.update()
     P1.move()
     P1.acceleration()
     P1.targetting()
-    #time.sleep(0.03)
+    time.sleep(0.03)
     
     root.after(1, game_process)
     
