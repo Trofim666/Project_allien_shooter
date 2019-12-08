@@ -12,6 +12,7 @@ canv = tk.Canvas(root, bg='pink')
 canv.pack(fill=tk.BOTH, expand=1)
 k_x = 1
 k_y = 1
+
 i=0
 k=0
 x_0 = 100
@@ -19,6 +20,12 @@ y_0 = 25
 R = 300
 a = 200
 enemys=[]
+
+M = 1
+dt = 1
+w = 0.001
+
+
 
 def create_objects():
     canv.create_oval (x_0, y_0, x_0 + 2*R, y_0 + 2*R, outline="gray", fill="red", width=2)
@@ -31,6 +38,7 @@ class Ball():
         self.x = x
         self.y = y
         self.r = 2
+        self.live = 200
         self.vx = 40
         self.vy = 40
         self.color = choice(['blue', 'green', 'red', 'brown'])
@@ -65,12 +73,22 @@ class Player():
         self.f2_on = 0
         self.x = 400
         self.y = 325
+        
+        
+        self.ay = 0
+        self.ax = 0
+        self.xc = 400
+        self.yc = 325
+        self.m = 10
+        self.F = self.m*M*0.1
+        
         self.an = 1
         #self.color = choice(['blue', 'green', 'yellow', 'brown'])
         self.a1 = 30
         self.a2 = 15
-        self.vx = 10
-        self.vy = 10
+        self.vx = 0
+        self.vy = 0
+        self.v = math.sqrt(self.vx**2 + self.vy**2)
         self.l = 50
         self.id1 = canv.create_oval(
                 self.x - self.a1,
@@ -152,11 +170,33 @@ class Player():
                     )
         k_x = math.cos(self.an)
         k_y = math.sin(self.an)
-    
+        
+        
+        
+    def acceleration(self):
+        global k_x, k_y
+        #sina = (self.y-self.yc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2   )
+        #cosa =(self.x-self.xc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2  ) 
+        #self.ax = self.F*k_x/self.m + k_x * 2*w*self.vy + w**2*(self.x-self.xc)
+        #self.ay = self.F*k_y/self.m + k_y * 2*w*self.vx + w**2*(self.y-self.yc)
+        self.ax =  -2*w*self.vy + (w**2)*(self.x-self.xc)
+        self.ay =  2*w*self.vx +(w**2)*(self.y-self.yc)
+        self.vx +=self.ax*dt 
+        self.vy +=self.ay*dt
+        self.v = math.sqrt(self.vx**2 + self.vy**2)
+    def move(self):
+        global k_x, k_y
+        #self.x += -k_y*self.v
+        #self.y += k_x*self.v
+        self.x+=self.vx#*0.1
+        self.y+=self.vy#*0.1
+        self.set_coords1()
+        self.set_coords2()
+        self.set_coords3()
     def move_right(self, event):  
         global k_x, k_y
-        self.x += -k_y*self.vx
-        self.y += k_x*self.vy
+        self.x += -k_y*self.v
+        self.y += k_x*self.v
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -164,17 +204,18 @@ class Player():
         
     def move_left(self, event):
         global k_x, k_y
-        self.x += k_y*self.vx
-        self.y += -k_x*self.vy
+        self.x += k_y*self.v
+        self.y += -k_x*self.v
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
         
     def move_up(self, event):
         global k_x, k_y
-        
-        self.x += k_x*self.vx
-        self.y += k_y*self.vy
+        self.vx+=self.F*k_x/self.m
+        self.vy+=self.F*k_y/self.m
+        #self.x += k_x*self.v
+        #self.y += k_y*self.v
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -182,8 +223,8 @@ class Player():
     def move_down(self, event):
         global k_x, k_y
         
-        self.x += -k_x*self.vx
-        self.y += -k_y*self.vy
+        self.x += -k_x*self.v
+        self.y += -k_y*self.v
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -288,12 +329,19 @@ def game_process(event=''):
     root.bind('<Left>', P1.move_left)
     root.bind('<Up>', P1.move_up)
     root.bind('<Down>', P1.move_down)
+    delete = []
     for b in balls:
             b.move()
+            b.live+= -1
+            if b.live<=0:
+                canv.delete(b.id)
     canv.update()
-    time.sleep(0.03)
+    P1.move()
+    P1.acceleration()
     P1.targetting()
-    root.after(20, game_process)
+    time.sleep(0.03)
+    
+    root.after(1, game_process)
     
 create_objects()
          
