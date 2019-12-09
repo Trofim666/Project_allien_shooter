@@ -32,17 +32,6 @@ yc = 325
 xc = 500
 enemys=[]
 
-w = 0.01
-yc = 325
-xc = 500
-
-
-yc = 325
-xc = 500
-
-
-
-
 
 def create_objects():
     canv.create_oval (x_0, y_0, x_0 + 2*R, y_0 + 2*R, outline="gray", fill="red", width=2)
@@ -51,29 +40,11 @@ def create_objects():
 
 class Ball():
     def __init__(self, x=400, y=325):
-        
+
         self.x = x
         self.y = y
         self.r = 2
-
         self.live = 25
-
-
-        self.live = 40
-
-
-
-        self.live = 20
-
-        self.live = 200
-
-
-        self.live = 20
-
-
-
-
-
         self.vx = 40
         self.vy = 40
         self.color = choice(['blue', 'green', 'red', 'brown'])
@@ -108,15 +79,7 @@ class Player():
         self.f2_on = 0
         self.x = 400
         self.y = 325
-
         self.live = 100
-
-        self.live = 100
-
-
-
-
-        
         self.ay = 0
         self.ax = 0
         self.xc = 400
@@ -211,9 +174,9 @@ class Player():
                     )
         k_x = math.cos(self.an)
         k_y = math.sin(self.an)
-        
-        
-        
+
+
+
     def acceleration(self):
         global k_x, k_y
         #sina = (self.y-self.yc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2   )
@@ -225,6 +188,8 @@ class Player():
         self.vx +=self.ax*dt 
         self.vy +=self.ay*dt
         self.v = math.sqrt(self.vx**2 + self.vy**2)
+
+
     def move(self):
         global k_x, k_y
         #self.x += -k_y*self.v
@@ -234,24 +199,14 @@ class Player():
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
+
+
     def move_right(self, event):  
         global k_x, k_y
-
         self.vx+=-self.F*k_x/self.m
         self.vy+=self.F*k_y/self.m
-
-
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=self.F*k_y/self.m
-
-
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=self.F*k_y/self.m
-
         self.x += -k_y*self.v
         self.y += k_x*self.v
-
-
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -259,23 +214,10 @@ class Player():
         
     def move_left(self, event):
         global k_x, k_y
-
         self.vx+=self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
-
-
-        self.vx+=self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-
-
-        self.vx+=self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-
         self.x += k_y*self.v
         self.y += -k_x*self.v
-
-
-
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -292,24 +234,10 @@ class Player():
         
     def move_down(self, event):
         global k_x, k_y
-        
-
         self.vx+=-self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
-
-
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-
-
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-        
         self.x += -k_x*self.v
         self.y += -k_y*self.v
-
-
-
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -377,25 +305,12 @@ def change_velocity_vy(vx, vy, x, y):
     return vy
 
 
-def hit(all_points, id_points):
-    canv.coords(self.id, -10, -10, -10, -10)
-    all_points += points
-    canv.itemconfig(id_points, text=all_points)
-
-
 def new_enemy():
     x = rnd(100,700)
     y = rnd(100,500)
     r = rnd(10,15)
     vx=rnd(-6, 6)
     vy=rnd(-6, 6)
-
-
-
-
-    live=1
-
-
     if (x - (x_0 + R))**2 + (y - (y_0 + R))**2 >= a**2 and (x - (x_0 + R))**2 + (y - (y_0 + R))**2 <= (R-40)**2 :
         id_ = canv.create_oval( x - r, y - r, x + r, y + r,fill = 'black', width=0)
         enemy={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy}
@@ -406,21 +321,12 @@ def motion():
     for e in enemys:
 
         e['vx']+= ( -2*w*e['vy'] + (w**2)*(-x_0 - R + e['x'])  )*dt
-        e['vy']+= ( -2*w*e['vx'] + (w**2)*(-y_0 - R + e['y'])  )*dt
-        if (x_0 + R - e['x'] - e['vx'])**2 + (y_0 + R - e['y'] - e['vy'])**2>= (R-e['r'])**2:
-
+        e['vy']+= ( 2*w*e['vx'] + (w**2)*(-y_0 - R + e['y'])  )*dt
         if (x_0 + R - e['x'])**2 + (y_0 + R - e['y'])**2 >= (R-e['r'])**2:            
- 
             vx = change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
             vy = change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
             e['vx'] = vx
             e['vy'] = vy
-
-        e['x']+=e['vx']
-        e['y']+=e['vy']
-        canv.move(e['id'], e['vx'], e['vy'])
-    root.after(20 , motion)
-
         canv.move(e['id'], e['vx'], e['vy'])
         e['x']+=e['vx']
         e['y']+=e['vy']
@@ -432,15 +338,10 @@ balls = []
 bullet = 0
 
 def game_process(event=''):
-
     global balls, bullet, all_points
     canv.itemconfig(screen1, text=str(bullet))
     root.bind('<Button-1>', P1.fire2_start)
     root.bind('<ButtonRelease-1>', P1.fire2_end)
-
-    global balls, bullet
-
-
     root.bind('<Motion>', P1.targetting)
     root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
@@ -449,18 +350,7 @@ def game_process(event=''):
     root.bind('<Button-1>', P1.fire2_start)
     root.bind('<ButtonRelease-1>', P1.fire2_end)
     delete = []
-
-    if balls:
-        for b in balls:
-                b.move()
-                b.live+= -1
-                if b.live<=0:
-                    canv.delete(b.id)
-
     for b in balls:
-
-
-
         b.move()
         for k, e in enumerate(enemys):   
             if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
@@ -470,22 +360,7 @@ def game_process(event=''):
         if b.live<=0:
             canv.delete(b.id)
         b.live+= -1
-
-
     canv.itemconfig(id_points, text='Score:'+str(all_points))
-
-        
-
-            b.move()
-            b.live+= -1
-            if b.live<=0:
-                canv.delete(b.id)
-
-
-
-
-
-
     canv.update()
     P1.move()
     P1.acceleration()
