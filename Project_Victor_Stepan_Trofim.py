@@ -207,13 +207,6 @@ class Player():
         self.vy+=self.F*k_y/self.m
 
 
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=self.F*k_y/self.m
-
-        self.x += -k_y*self.v
-        self.y += k_x*self.v
-
-
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -224,13 +217,6 @@ class Player():
 
         self.vx+=self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
-
-
-        self.vx+=self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-
-        self.x += k_y*self.v
-        self.y += -k_x*self.v
 
 
         self.set_coords1()
@@ -254,12 +240,6 @@ class Player():
         self.vx+=-self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
 
-
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-        
-        self.x += -k_x*self.v
-        self.y += -k_y*self.v
 
 
         self.set_coords1()
@@ -346,7 +326,7 @@ def motion():
     for e in enemys:
         e['vx']+= ( -2*w*e['vy'] + (w**2)*(-x_0 - R + e['x'])  )*dt
         e['vy']+= ( +2*w*e['vx'] + (w**2)*(-y_0 - R + e['y'])  )*dt
-        if (x_0 + R - e['x'])**2 + (y_0 + R - e['y'])**2 >= (R-e['r'])**2:
+        if (x_0 + R - e['x']-e['vx'])**2 + (y_0 + R - e['y']-e['vy'])**2 >= (R-e['r'])**2:
             vx = change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
             vy = change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
             e['vx'] = vx
@@ -373,7 +353,7 @@ def game_process(event=''):
     for b in balls:
         b.move()
         for k, e in enumerate(enemys):   
-            if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
+            if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2 and b.live>=0:
                 canv.delete(e['id'])
                 all_points +=1
                 del enemys[k]
