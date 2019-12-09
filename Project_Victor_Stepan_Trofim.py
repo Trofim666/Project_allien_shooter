@@ -12,25 +12,25 @@ canv = tk.Canvas(root, bg='pink')
 canv.pack(fill=tk.BOTH, expand=1)
 all_points = 0
 id_points = canv.create_text(30,30,text = all_points,font = '28')
-
+screen1 = canv.create_text(400, 300, text='', font='28')
 
 k_x = 1
 k_y = 1
+
 i=0
 k=0
 x_0 = 100
 y_0 = 25
 R = 300
 a = 200
-screen1 = canv.create_text(400, 300, text='', font='28')
 M = 1
 dt = 1
-
-w = 0.001
-
+w = 0.02
 yc = 325
 xc = 500
 enemys=[]
+
+
 
 
 def create_objects():
@@ -40,11 +40,12 @@ def create_objects():
 
 class Ball():
     def __init__(self, x=400, y=325):
-
+        
         self.x = x
         self.y = y
         self.r = 2
-        self.live = 25
+
+        self.live = 40
         self.vx = 40
         self.vy = 40
         self.color = choice(['blue', 'green', 'red', 'brown'])
@@ -79,6 +80,7 @@ class Player():
         self.f2_on = 0
         self.x = 400
         self.y = 325
+
         self.live = 100
         self.ay = 0
         self.ax = 0
@@ -150,6 +152,7 @@ class Player():
 
     def fire2_end(self, event):
         global balls, bullet
+        bullet += 1
         new_ball = Ball(self.x, self.y)
         new_ball.r += 5
         self.an = math.atan2((event.y-new_ball.y) , (event.x-new_ball.x))
@@ -174,9 +177,9 @@ class Player():
                     )
         k_x = math.cos(self.an)
         k_y = math.sin(self.an)
-
-
-
+        
+        
+        
     def acceleration(self):
         global k_x, k_y
         #sina = (self.y-self.yc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2   )
@@ -188,8 +191,6 @@ class Player():
         self.vx +=self.ax*dt 
         self.vy +=self.ay*dt
         self.v = math.sqrt(self.vx**2 + self.vy**2)
-
-
     def move(self):
         global k_x, k_y
         #self.x += -k_y*self.v
@@ -199,14 +200,20 @@ class Player():
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
-
-
     def move_right(self, event):  
         global k_x, k_y
+
         self.vx+=-self.F*k_x/self.m
         self.vy+=self.F*k_y/self.m
+
+
+        self.vx+=-self.F*k_x/self.m
+        self.vy+=self.F*k_y/self.m
+
         self.x += -k_y*self.v
         self.y += k_x*self.v
+
+
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -214,10 +221,18 @@ class Player():
         
     def move_left(self, event):
         global k_x, k_y
+
         self.vx+=self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
+
+
+        self.vx+=self.F*k_x/self.m
+        self.vy+=-self.F*k_y/self.m
+
         self.x += k_y*self.v
         self.y += -k_x*self.v
+
+
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -234,10 +249,19 @@ class Player():
         
     def move_down(self, event):
         global k_x, k_y
+        
+
         self.vx+=-self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
+
+
+        self.vx+=-self.F*k_x/self.m
+        self.vy+=-self.F*k_y/self.m
+        
         self.x += -k_x*self.v
         self.y += -k_y*self.v
+
+
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -317,21 +341,20 @@ def new_enemy():
         enemys.append(enemy)
     root.after(200,new_enemy)
 
+
 def motion():
     for e in enemys:
-
         e['vx']+= ( -2*w*e['vy'] + (w**2)*(-x_0 - R + e['x'])  )*dt
-        e['vy']+= ( 2*w*e['vx'] + (w**2)*(-y_0 - R + e['y'])  )*dt
-        if (x_0 + R - e['x'])**2 + (y_0 + R - e['y'])**2 >= (R-e['r'])**2:            
+        e['vy']+= ( +2*w*e['vx'] + (w**2)*(-y_0 - R + e['y'])  )*dt
+        if (x_0 + R - e['x'])**2 + (y_0 + R - e['y'])**2 >= (R-e['r'])**2:
             vx = change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
             vy = change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
             e['vx'] = vx
             e['vy'] = vy
-        canv.move(e['id'], e['vx'], e['vy'])
         e['x']+=e['vx']
         e['y']+=e['vy']
-    root.after(10, motion)
-
+        canv.move(e['id'], e['vx'], e['vy'])
+    root.after(20 , motion)
 
 
 balls = []
@@ -339,9 +362,6 @@ bullet = 0
 
 def game_process(event=''):
     global balls, bullet, all_points
-    canv.itemconfig(screen1, text=str(bullet))
-    root.bind('<Button-1>', P1.fire2_start)
-    root.bind('<ButtonRelease-1>', P1.fire2_end)
     root.bind('<Motion>', P1.targetting)
     root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
@@ -379,3 +399,4 @@ motion()
 
 
 root.mainloop()
+
