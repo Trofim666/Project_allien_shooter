@@ -24,6 +24,8 @@ enemys=[]
 M = 1
 dt = 1
 w = 0.001
+yc = 325
+xc = 500
 
 
 
@@ -195,8 +197,8 @@ class Player():
         self.set_coords3()
     def move_right(self, event):  
         global k_x, k_y
-        self.x += -k_y*self.v
-        self.y += k_x*self.v
+        self.vx+=-self.F*k_x/self.m
+        self.vy+=self.F*k_y/self.m
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -204,8 +206,8 @@ class Player():
         
     def move_left(self, event):
         global k_x, k_y
-        self.x += k_y*self.v
-        self.y += -k_x*self.v
+        self.vx+=self.F*k_x/self.m
+        self.vy+=-self.F*k_y/self.m
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -223,8 +225,8 @@ class Player():
     def move_down(self, event):
         global k_x, k_y
         
-        self.x += -k_x*self.v
-        self.y += -k_y*self.v
+        self.vx+=-self.F*k_x/self.m
+        self.vy+=-self.F*k_y/self.m
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -307,7 +309,7 @@ def new_enemy():
 
 def motion():
     for e in enemys:
-        if (x_0 + R - e['x'])**2 + (y_0 + R - e['y'])**2 >= (R)**2:
+        if (x_0 + R - e['x'] + e['vx']*(e['x']-xc)/math.sqrt( (e['x']-xc)**2 + (e['y']-yc)**2 ))**2 + (y_0 + R - e['y'] + e['vy']*(e['y']-yc)/math.sqrt( (e['x']-xc)**2 + (e['y']-yc)**2 ))**2>= (R)**2:
             e['vx'] = change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
             e['vy'] = change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
         e['x']+=e['vx']
