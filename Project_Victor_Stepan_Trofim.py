@@ -25,6 +25,10 @@ M = 1
 dt = 1
 w = 0.001
 
+yc = 325
+xc = 500
+
+
 
 
 def create_objects():
@@ -38,7 +42,15 @@ class Ball():
         self.x = x
         self.y = y
         self.r = 2
+
+
         self.live = 20
+
+        self.live = 200
+
+
+        self.live = 20
+
         self.vx = 40
         self.vy = 40
         self.color = choice(['blue', 'green', 'red', 'brown'])
@@ -66,6 +78,19 @@ class Ball():
         self.set_coords()    
 
 
+    def hittest(self, obj):
+        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
+
+        Args:
+            obj: Обьект, с которым проверяется столкновение.
+        Returns:
+            Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
+        """
+        if ((self.x-obj.x)**2+(self.y-obj.y)**2)**0.5 <= self.r + obj.r:
+            return True
+        else:
+            return False 
+
 class Player():
     
     def __init__(self, ):
@@ -73,7 +98,11 @@ class Player():
         self.f2_on = 0
         self.x = 400
         self.y = 325
-        
+
+        self.live = 100
+
+
+
         
         self.ay = 0
         self.ax = 0
@@ -195,8 +224,13 @@ class Player():
         self.set_coords3()
     def move_right(self, event):  
         global k_x, k_y
+
+        self.vx+=-self.F*k_x/self.m
+        self.vy+=self.F*k_y/self.m
+
         self.x += -k_y*self.v
         self.y += k_x*self.v
+
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -204,8 +238,13 @@ class Player():
         
     def move_left(self, event):
         global k_x, k_y
+
+        self.vx+=self.F*k_x/self.m
+        self.vy+=-self.F*k_y/self.m
+
         self.x += k_y*self.v
         self.y += -k_x*self.v
+
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -223,8 +262,13 @@ class Player():
     def move_down(self, event):
         global k_x, k_y
         
+
+        self.vx+=-self.F*k_x/self.m
+        self.vy+=-self.F*k_y/self.m
+        
         self.x += -k_x*self.v
         self.y += -k_y*self.v
+
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -264,7 +308,6 @@ def change_velocity_vx(vx, vy, x, y):
 
     vel_1_x = scalar_multiplication(vel_normal_1, i)
     vel_2_x = scalar_multiplication(vel_tau, i)
-    
     vx = vel_1_x + vel_2_x
     
     return vx
@@ -297,24 +340,26 @@ def new_enemy():
     x = rnd(100,700)
     y = rnd(100,500)
     r = rnd(10,15)
-    vx=rnd(-4, 4)
-    vy=rnd(-4, 4)
+    vx=rnd(-6, 6)
+    vy=rnd(-6, 6)
+    live=1
     if (x - (x_0 + R))**2 + (y - (y_0 + R))**2 >= a**2 and (x - (x_0 + R))**2 + (y - (y_0 + R))**2 <= (R-40)**2 :
         id_ = canv.create_oval( x - r, y - r, x + r, y + r,fill = 'black', width=0)
-        enemy={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy}
+        enemy={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy, 'live': live}
         enemys.append(enemy)
-    root.after(600,new_enemy)
+    root.after(300,new_enemy)
 
 def motion():
     for e in enemys:
-        if (x_0 + R - e['x'])**2 + (y_0 + R - e['y'])**2 >= (R)**2:
-            e['vx'] = change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
-            e['vy'] = change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
+        if (x_0 + R - e['x'])**2 + (y_0 + R - e['y'])**2 >= (R-e['r'])**2:            
+            vx = change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
+            vy = change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
+            e['vx'] = vx
+            e['vy'] = vy
+        canv.move(e['id'], e['vx'], e['vy'])
         e['x']+=e['vx']
         e['y']+=e['vy']
-        canv.move(e['id'], e['vx'], e['vy'])
     root.after(10, motion)
-
 
 
 balls = []
@@ -331,10 +376,23 @@ def game_process(event=''):
     root.bind('<Down>', P1.move_down)
     delete = []
     for b in balls:
+
+        b.move()
+        for k, e in enumerate(enemys):   
+            if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
+                canv.delete(e['id'])
+                del enemys[k]
+        if b.live<=0:
+            canv.delete(b.id)
+        b.live+= -1
+
+        
+
             b.move()
             b.live+= -1
             if b.live<=0:
                 canv.delete(b.id)
+
     canv.update()
     P1.move()
     P1.acceleration()
