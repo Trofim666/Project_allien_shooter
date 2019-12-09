@@ -26,17 +26,9 @@ screen1 = canv.create_text(400, 300, text='', font='28')
 M = 1
 dt = 1
 w = 0.001
-<<<<<<< HEAD
 yc = 325
 xc = 500
 enemys=[]
-=======
-
-yc = 325
-xc = 500
-
-
->>>>>>> 1f1a4517013faf7333ee46534834429ae7d35f48
 
 
 def create_objects():
@@ -50,19 +42,7 @@ class Ball():
         self.x = x
         self.y = y
         self.r = 2
-<<<<<<< HEAD
         self.live = 25
-=======
-
-
-        self.live = 20
-
-        self.live = 200
-
-
-        self.live = 20
-
->>>>>>> 1f1a4517013faf7333ee46534834429ae7d35f48
         self.vx = 40
         self.vy = 40
         self.color = choice(['blue', 'green', 'red', 'brown'])
@@ -97,15 +77,7 @@ class Player():
         self.f2_on = 0
         self.x = 400
         self.y = 325
-<<<<<<< HEAD
         self.live = 100
-=======
-
-        self.live = 100
-
-
-
->>>>>>> 1f1a4517013faf7333ee46534834429ae7d35f48
         
         self.ay = 0
         self.ax = 0
@@ -226,18 +198,8 @@ class Player():
         self.set_coords3()
     def move_right(self, event):  
         global k_x, k_y
-<<<<<<< HEAD
         self.vx+=-self.F*k_x/self.m
         self.vy+=self.F*k_y/self.m
-=======
-
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=self.F*k_y/self.m
-
-        self.x += -k_y*self.v
-        self.y += k_x*self.v
-
->>>>>>> 1f1a4517013faf7333ee46534834429ae7d35f48
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -245,18 +207,8 @@ class Player():
         
     def move_left(self, event):
         global k_x, k_y
-<<<<<<< HEAD
         self.vx+=self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
-=======
-
-        self.vx+=self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-
-        self.x += k_y*self.v
-        self.y += -k_x*self.v
-
->>>>>>> 1f1a4517013faf7333ee46534834429ae7d35f48
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -274,18 +226,8 @@ class Player():
     def move_down(self, event):
         global k_x, k_y
         
-<<<<<<< HEAD
         self.vx+=-self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
-=======
-
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-        
-        self.x += -k_x*self.v
-        self.y += -k_y*self.v
-
->>>>>>> 1f1a4517013faf7333ee46534834429ae7d35f48
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -399,10 +341,6 @@ def game_process(event=''):
     root.bind('<Down>', P1.move_down)
     delete = []
     for b in balls:
-<<<<<<< HEAD
-=======
-
->>>>>>> 1f1a4517013faf7333ee46534834429ae7d35f48
         b.move()
         for k, e in enumerate(enemys):   
             if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
@@ -413,17 +351,7 @@ def game_process(event=''):
             canv.delete(b.id)
         b.live+= -1
 
-<<<<<<< HEAD
     canv.itemconfig(id_points, text='Score:'+str(all_points))
-=======
-        
-
-            b.move()
-            b.live+= -1
-            if b.live<=0:
-                canv.delete(b.id)
-
->>>>>>> 1f1a4517013faf7333ee46534834429ae7d35f48
     canv.update()
     P1.move()
     P1.acceleration()
