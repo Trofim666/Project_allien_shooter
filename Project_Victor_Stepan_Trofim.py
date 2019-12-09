@@ -23,7 +23,7 @@ enemys=[]
 
 M = 1
 dt = 1
-w = 0.001
+w = 0.01
 yc = 325
 xc = 500
 
@@ -40,7 +40,7 @@ class Ball():
         self.x = x
         self.y = y
         self.r = 2
-        self.live = 20
+        self.live = 40
         self.vx = 40
         self.vy = 40
         self.color = choice(['blue', 'green', 'red', 'brown'])
@@ -299,8 +299,8 @@ def new_enemy():
     x = rnd(100,700)
     y = rnd(100,500)
     r = rnd(10,15)
-    vx=rnd(-4, 4)
-    vy=rnd(-4, 4)
+    vx=rnd(-6, 6)
+    vy=rnd(-6, 6)
     if (x - (x_0 + R))**2 + (y - (y_0 + R))**2 >= a**2 and (x - (x_0 + R))**2 + (y - (y_0 + R))**2 <= (R-40)**2 :
         id_ = canv.create_oval( x - r, y - r, x + r, y + r,fill = 'black', width=0)
         enemy={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy}
@@ -309,13 +309,17 @@ def new_enemy():
 
 def motion():
     for e in enemys:
-        if (x_0 + R - e['x'] + e['vx']*(e['x']-xc)/math.sqrt( (e['x']-xc)**2 + (e['y']-yc)**2 ))**2 + (y_0 + R - e['y'] + e['vy']*(e['y']-yc)/math.sqrt( (e['x']-xc)**2 + (e['y']-yc)**2 ))**2>= (R)**2:
-            e['vx'] = change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
-            e['vy'] = change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
+        e['vx']+= ( -2*w*e['vy'] + (w**2)*(-x_0 - R + e['x'])  )*dt
+        e['vy']+= ( -2*w*e['vx'] + (w**2)*(-y_0 - R + e['y'])  )*dt
+        if (x_0 + R - e['x'] - e['vx'])**2 + (y_0 + R - e['y'] - e['vy'])**2>= (R-e['r'])**2:
+            vx = change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
+            vy = change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
+            e['vx'] = vx
+            e['vy'] = vy
         e['x']+=e['vx']
         e['y']+=e['vy']
         canv.move(e['id'], e['vx'], e['vy'])
-    root.after(10, motion)
+    root.after(20 , motion)
 
 
 
@@ -324,26 +328,28 @@ bullet = 0
 
 def game_process(event=''):
     global balls, bullet
-    root.bind('<Button-1>', P1.fire2_start)
-    root.bind('<ButtonRelease-1>', P1.fire2_end)
+
     root.bind('<Motion>', P1.targetting)
     root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
     root.bind('<Up>', P1.move_up)
     root.bind('<Down>', P1.move_down)
+    root.bind('<Button-1>', P1.fire2_start)
+    root.bind('<ButtonRelease-1>', P1.fire2_end)
     delete = []
-    for b in balls:
-            b.move()
-            b.live+= -1
-            if b.live<=0:
-                canv.delete(b.id)
+    if balls:
+        for b in balls:
+                b.move()
+                b.live+= -1
+                if b.live<=0:
+                    canv.delete(b.id)
     canv.update()
     P1.move()
     P1.acceleration()
     P1.targetting()
     time.sleep(0.03)
     
-    root.after(1, game_process)
+    root.after(3, game_process)
     
 create_objects()
          
