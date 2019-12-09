@@ -10,25 +10,36 @@ fr = tk.Frame(root)
 root.geometry('800x650')
 canv = tk.Canvas(root, bg='pink')
 canv.pack(fill=tk.BOTH, expand=1)
+all_points = 0
+id_points = canv.create_text(30,30,text = all_points,font = '28')
+
+
 k_x = 1
 k_y = 1
-
 i=0
 k=0
 x_0 = 100
 y_0 = 25
 R = 300
 a = 200
-enemys=[]
-
+screen1 = canv.create_text(400, 300, text='', font='28')
 M = 1
 dt = 1
+
+w = 0.001
+
+yc = 325
+xc = 500
+enemys=[]
+
 w = 0.01
 yc = 325
 xc = 500
 
+
 yc = 325
 xc = 500
+
 
 
 
@@ -45,6 +56,9 @@ class Ball():
         self.y = y
         self.r = 2
 
+        self.live = 25
+
+
         self.live = 40
 
 
@@ -55,6 +69,9 @@ class Ball():
 
 
         self.live = 20
+
+
+
 
 
         self.vx = 40
@@ -84,19 +101,6 @@ class Ball():
         self.set_coords()    
 
 
-    def hittest(self, obj):
-        """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
-
-        Args:
-            obj: Обьект, с которым проверяется столкновение.
-        Returns:
-            Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
-        """
-        if ((self.x-obj.x)**2+(self.y-obj.y)**2)**0.5 <= self.r + obj.r:
-            return True
-        else:
-            return False 
-
 class Player():
     
     def __init__(self, ):
@@ -106,6 +110,9 @@ class Player():
         self.y = 325
 
         self.live = 100
+
+        self.live = 100
+
 
 
 
@@ -180,7 +187,6 @@ class Player():
 
     def fire2_end(self, event):
         global balls, bullet
-        bullet += 1
         new_ball = Ball(self.x, self.y)
         new_ball.r += 5
         self.an = math.atan2((event.y-new_ball.y) , (event.x-new_ball.x))
@@ -238,6 +244,10 @@ class Player():
         self.vx+=-self.F*k_x/self.m
         self.vy+=self.F*k_y/self.m
 
+
+        self.vx+=-self.F*k_x/self.m
+        self.vy+=self.F*k_y/self.m
+
         self.x += -k_y*self.v
         self.y += k_x*self.v
 
@@ -257,8 +267,13 @@ class Player():
         self.vx+=self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
 
+
+        self.vx+=self.F*k_x/self.m
+        self.vy+=-self.F*k_y/self.m
+
         self.x += k_y*self.v
         self.y += -k_x*self.v
+
 
 
         self.set_coords1()
@@ -281,13 +296,18 @@ class Player():
 
         self.vx+=-self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
-=======
+
+
+        self.vx+=-self.F*k_x/self.m
+        self.vy+=-self.F*k_y/self.m
+
 
         self.vx+=-self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
         
         self.x += -k_x*self.v
         self.y += -k_y*self.v
+
 
 
         self.set_coords1()
@@ -357,6 +377,12 @@ def change_velocity_vy(vx, vy, x, y):
     return vy
 
 
+def hit(all_points, id_points):
+    canv.coords(self.id, -10, -10, -10, -10)
+    all_points += points
+    canv.itemconfig(id_points, text=all_points)
+
+
 def new_enemy():
     x = rnd(100,700)
     y = rnd(100,500)
@@ -365,13 +391,16 @@ def new_enemy():
     vy=rnd(-6, 6)
 
 
+
+
     live=1
+
 
     if (x - (x_0 + R))**2 + (y - (y_0 + R))**2 >= a**2 and (x - (x_0 + R))**2 + (y - (y_0 + R))**2 <= (R-40)**2 :
         id_ = canv.create_oval( x - r, y - r, x + r, y + r,fill = 'black', width=0)
-        enemy={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy, 'live': live}
+        enemy={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy}
         enemys.append(enemy)
-    root.after(300,new_enemy)
+    root.after(200,new_enemy)
 
 def motion():
     for e in enemys:
@@ -403,7 +432,14 @@ balls = []
 bullet = 0
 
 def game_process(event=''):
+
+    global balls, bullet, all_points
+    canv.itemconfig(screen1, text=str(bullet))
+    root.bind('<Button-1>', P1.fire2_start)
+    root.bind('<ButtonRelease-1>', P1.fire2_end)
+
     global balls, bullet
+
 
     root.bind('<Motion>', P1.targetting)
     root.bind('<Right>', P1.move_right)    
@@ -423,14 +459,20 @@ def game_process(event=''):
 
     for b in balls:
 
+
+
         b.move()
         for k, e in enumerate(enemys):   
             if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
                 canv.delete(e['id'])
+                all_points +=1
                 del enemys[k]
         if b.live<=0:
             canv.delete(b.id)
         b.live+= -1
+
+
+    canv.itemconfig(id_points, text='Score:'+str(all_points))
 
         
 
@@ -438,6 +480,10 @@ def game_process(event=''):
             b.live+= -1
             if b.live<=0:
                 canv.delete(b.id)
+
+
+
+
 
 
     canv.update()
