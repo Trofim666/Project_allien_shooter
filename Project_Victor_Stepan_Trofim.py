@@ -12,7 +12,10 @@ canv = tk.Canvas(root, bg='pink')
 canv.pack(fill=tk.BOTH, expand=1)
 all_points = 0
 hp = 100
+x_hp = 200
 id_points = canv.create_text(30,30,text = all_points,font = '28')
+id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
+id_hp_percents = canv.create_text(25,90,text = str(hp) + '%',font = '28')
 
 
 k_x = 1
@@ -125,14 +128,19 @@ class Player():
             start_new_game()
             time.sleep(2)
             canv.delete(screen1)
-                    
+
         
     def check_minus_hp(self):
-        global enemys
+        global enemys, hp, x_hp,  id_hp
         
         for e in enemys:
             if (e['x'] - self.x)**2 + (e['y'] - self.y)**2 <= (self.a1 + e['r'])**2:
                 self.live -= 1
+                hp -= 1
+                x_hp -= 2
+                canv.itemconfig(id_hp_percents, text = str(hp) + '%')
+                canv.delete(id_hp)
+                id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
                 
         if self.live == 0:
             start_new_game()
@@ -235,14 +243,6 @@ class Player():
         self.vx+=-self.F*k_x/self.m
         self.vy+=self.F*k_y/self.m
 
-
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=self.F*k_y/self.m
-
-        self.x += -k_y*self.v
-        self.y += k_x*self.v
-
-
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
@@ -253,14 +253,6 @@ class Player():
 
         self.vx+=self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
-
-
-        self.vx+=self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-
-        self.x += k_y*self.v
-        self.y += -k_x*self.v
-
 
         self.set_coords1()
         self.set_coords2()
@@ -285,14 +277,6 @@ class Player():
 
         self.vx+=-self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
-
-
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-        
-        self.x += -k_x*self.v
-        self.y += -k_y*self.v
-
 
         self.set_coords1()
         self.set_coords2()
@@ -395,7 +379,7 @@ bullet = 0
 
 def start_new_game():    
     
-    global balls, screen1, enemys, all_points, screen1
+    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents
             
     screen1 = canv.create_text(400, 300, text='GAME OVER', font = "Times 100 italic bold")
     
@@ -411,6 +395,12 @@ def start_new_game():
     P1.y = 325
     P1.vx = 0
     P1.vy = 0
+    hp = 100
+    x_hp = 200
+    canv.delete(id_hp)
+    canv.delete(id_hp_percents)
+    id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
+    id_hp_percents = canv.create_text(25,90,text = str(hp) + '%' ,font = '28')
     P1.set_coords1
     P1.set_coords2
     P1.set_coords3
