@@ -1,9 +1,9 @@
+from math import sqrt
 from random import randrange as rnd, choice
 import tkinter as tk
 import math
 import time
 import graphics as gr
-from math import sqrt
 
 root = tk.Tk()
 fr = tk.Frame(root)
@@ -11,8 +11,9 @@ root.geometry('800x650')
 canv = tk.Canvas(root, bg='pink')
 canv.pack(fill=tk.BOTH, expand=1)
 all_points = 0
+hp = 100
 id_points = canv.create_text(30,30,text = all_points,font = '28')
-screen1 = canv.create_text(400, 300, text='', font='28')
+
 
 k_x = 1
 k_y = 1
@@ -31,19 +32,18 @@ xc = 500
 enemys=[]
 
 
-
-
 def create_objects():
     canv.create_oval (x_0, y_0, x_0 + 2*R, y_0 + 2*R, outline="gray", fill="red", width=2)
     canv.create_oval (x_0 + R-a, y_0 + R-a, x_0 + R + a, y_0 + R+a, fill="white", width=2)
 
 
 class Ball():
+    
     def __init__(self, x=400, y=325):
         
         self.x = x
         self.y = y
-        self.r = 2
+        self.r = 3
 
         self.live = 40
         self.vx = 40
@@ -56,6 +56,7 @@ class Ball():
                 self.y + self.r,
                 fill=self.color
         )
+
 
     def set_coords(self):
         canv.coords(
@@ -114,7 +115,49 @@ class Player():
                 self.y + self.a2,
                 fill='yellow'
         )
+
         
+    def check_position(self):           # HERE
+        global balls, screen1, enemys
+        
+        if (self.x - self.xc)**2 + (self.y - self.yc)**2 >= R**2:
+            
+            start_new_game()
+                    
+        
+    def check_minus_hp(self):
+        global enemys
+        
+        for e in enemys:
+            if (e['x'] - self.x)**2 + (e['y'] - self.y)**2 <= (self.a1 + e['r'])**2:
+                self.live -= 1
+                
+        if self.live == 0:
+            start_new_game()
+        
+   
+        def start_new_game():    
+            global balls, screen1, enemys
+            
+            canv.itemconfig(screen1, text='GAME OVER')
+            for bb in balls:
+                canv.delete(bb.id)
+                balls=[]
+            
+            for e in enemys:
+                canv.delete(e['id'])
+                enemys = []
+                         
+            P1.x = 400
+            P1.y = 325
+            P1.x = 0
+            P1.y = 0
+            P1.set_coords1
+            time.sleep(3)
+            canv.delete(screen1)
+            game_process()
+            
+
     def set_coords2(self):
         canv.coords(
             self.id2,
@@ -123,6 +166,7 @@ class Player():
             self.x + self.a2,
             self.y + self.a2
         )
+    
     
     def set_coords1(self):
         canv.coords(
@@ -160,7 +204,6 @@ class Player():
         new_ball.vy = - self.f2_power * math.sin(self.an)
         balls += [new_ball]
         self.f2_on = 0
-
         
         
     def targetting(self, event=0):
@@ -179,7 +222,6 @@ class Player():
         k_y = math.sin(self.an)
         
         
-        
     def acceleration(self):
         global k_x, k_y
         #sina = (self.y-self.yc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2   )
@@ -191,6 +233,8 @@ class Player():
         self.vx +=self.ax*dt 
         self.vy +=self.ay*dt
         self.v = math.sqrt(self.vx**2 + self.vy**2)
+        
+        
     def move(self):
         global k_x, k_y
         #self.x += -k_y*self.v
@@ -200,11 +244,20 @@ class Player():
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
+        
+        
     def move_right(self, event):  
         global k_x, k_y
 
         self.vx+=-self.F*k_x/self.m
         self.vy+=self.F*k_y/self.m
+
+
+        self.vx+=-self.F*k_x/self.m
+        self.vy+=self.F*k_y/self.m
+
+        self.x += -k_y*self.v
+        self.y += k_x*self.v
 
 
         self.set_coords1()
@@ -219,12 +272,21 @@ class Player():
         self.vy+=-self.F*k_y/self.m
 
 
+        self.vx+=self.F*k_x/self.m
+        self.vy+=-self.F*k_y/self.m
+
+        self.x += k_y*self.v
+        self.y += -k_x*self.v
+
+
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
         
+        
     def move_up(self, event):
         global k_x, k_y
+        
         self.vx+=self.F*k_x/self.m
         self.vy+=self.F*k_y/self.m
         #self.x += k_x*self.v
@@ -233,6 +295,7 @@ class Player():
         self.set_coords2()
         self.set_coords3()
         
+        
     def move_down(self, event):
         global k_x, k_y
         
@@ -240,6 +303,12 @@ class Player():
         self.vx+=-self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
 
+
+        self.vx+=-self.F*k_x/self.m
+        self.vy+=-self.F*k_y/self.m
+        
+        self.x += -k_x*self.v
+        self.y += -k_y*self.v
 
 
         self.set_coords1()
@@ -326,7 +395,7 @@ def motion():
     for e in enemys:
         e['vx']+= ( -2*w*e['vy'] + (w**2)*(-x_0 - R + e['x'])  )*dt
         e['vy']+= ( +2*w*e['vx'] + (w**2)*(-y_0 - R + e['y'])  )*dt
-        if (x_0 + R - e['x']-e['vx'])**2 + (y_0 + R - e['y']-e['vy'])**2 >= (R-e['r'])**2:
+        if (x_0 + R - e['x'])**2 + (y_0 + R - e['y'])**2 >= (R-e['r'])**2:
             vx = change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
             vy = change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
             e['vx'] = vx
@@ -340,6 +409,35 @@ def motion():
 balls = []
 bullet = 0
 
+
+def start_new_game():    
+    
+    global balls, screen1, enemys, all_points
+            
+    canv.itemconfig(screen1, text='GAME OVER')
+    
+    for bb in balls:
+        canv.delete(bb.id)
+        balls=[]
+            
+    for e in enemys:
+        canv.delete(e['id'])
+        enemys = []
+                         
+    P1.x = 400
+    P1.y = 325
+    P1.vx = 0
+    P1.vy = 0
+    P1.set_coords1
+    P1.set_coords2
+    P1.set_coords3
+    P1.live = 100
+    #canv.itemconfig(screen1, text='')
+    all_points = 0
+    time.sleep(3)
+    game_process()
+
+
 def game_process(event=''):
     global balls, bullet, all_points
     root.bind('<Motion>', P1.targetting)
@@ -349,11 +447,11 @@ def game_process(event=''):
     root.bind('<Down>', P1.move_down)
     root.bind('<Button-1>', P1.fire2_start)
     root.bind('<ButtonRelease-1>', P1.fire2_end)
-    delete = []
+    
     for b in balls:
         b.move()
         for k, e in enumerate(enemys):   
-            if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2 and b.live>=0:
+            if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
                 canv.delete(e['id'])
                 all_points +=1
                 del enemys[k]
@@ -365,11 +463,14 @@ def game_process(event=''):
     P1.move()
     P1.acceleration()
     P1.targetting()
+    P1.check_position()
+    P1.check_minus_hp()
     time.sleep(0.03)
     
     root.after(3, game_process)
     
 create_objects()
+screen1 = canv.create_text(400, 300, text='', font = "Times 100 italic bold")
          
 P1 = Player()
 
@@ -379,4 +480,3 @@ motion()
 
 
 root.mainloop()
-
