@@ -123,6 +123,8 @@ class Player():
         if (self.x - self.xc)**2 + (self.y - self.yc)**2 >= R**2:
             
             start_new_game()
+            time.sleep(2)
+            canv.delete(screen1)
                     
         
     def check_minus_hp(self):
@@ -134,29 +136,10 @@ class Player():
                 
         if self.live == 0:
             start_new_game()
+            time.sleep(2)
+            canv.delete(screen1)
         
    
-        def start_new_game():    
-            global balls, screen1, enemys
-            
-            canv.itemconfig(screen1, text='GAME OVER')
-            for bb in balls:
-                canv.delete(bb.id)
-                balls=[]
-            
-            for e in enemys:
-                canv.delete(e['id'])
-                enemys = []
-                         
-            P1.x = 400
-            P1.y = 325
-            P1.x = 0
-            P1.y = 0
-            P1.set_coords1
-            time.sleep(3)
-            canv.delete(screen1)
-            game_process()
-            
 
     def set_coords2(self):
         canv.coords(
@@ -412,9 +395,9 @@ bullet = 0
 
 def start_new_game():    
     
-    global balls, screen1, enemys, all_points
+    global balls, screen1, enemys, all_points, screen1
             
-    canv.itemconfig(screen1, text='GAME OVER')
+    screen1 = canv.create_text(400, 300, text='GAME OVER', font = "Times 100 italic bold")
     
     for bb in balls:
         canv.delete(bb.id)
@@ -432,9 +415,7 @@ def start_new_game():
     P1.set_coords2
     P1.set_coords3
     P1.live = 100
-    #canv.itemconfig(screen1, text='')
     all_points = 0
-    time.sleep(3)
     game_process()
 
 
@@ -470,7 +451,7 @@ def game_process(event=''):
     root.after(3, game_process)
     
 create_objects()
-screen1 = canv.create_text(400, 300, text='', font = "Times 100 italic bold")
+
          
 P1 = Player()
 
