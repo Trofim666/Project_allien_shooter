@@ -1,9 +1,9 @@
+from math import sqrt
 from random import randrange as rnd, choice
 import tkinter as tk
 import math
 import time
 import graphics as gr
-from math import sqrt
 
 root = tk.Tk()
 fr = tk.Frame(root)
@@ -11,12 +11,15 @@ root.geometry('800x650')
 canv = tk.Canvas(root, bg='pink')
 canv.pack(fill=tk.BOTH, expand=1)
 all_points = 0
+hp = 100
+x_hp = 200
 id_points = canv.create_text(30,30,text = all_points,font = '28')
-screen1 = canv.create_text(400, 300, text='', font='28')
+id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
+id_hp_percents = canv.create_text(25,90,text = str(hp) + '%',font = '28')
 
+Rexp = 150
 k_x = 1
-k_y = 1
-
+k_y = 1 
 i=0
 k=0
 x_0 = 100
@@ -29,21 +32,38 @@ w = 0.02
 yc = 325
 xc = 500
 enemys=[]
-
-
-
+grenades=[]
+balls=[]
+boxes = []
 
 def create_objects():
     canv.create_oval (x_0, y_0, x_0 + 2*R, y_0 + 2*R, outline="gray", fill="red", width=2)
     canv.create_oval (x_0 + R-a, y_0 + R-a, x_0 + R + a, y_0 + R+a, fill="white", width=2)
 
 
+class Box():
+    def __init__(self):
+        self.gr = 5
+        self.bl = 10
+        self.x = rnd(100,700)
+        self.y = rnd(25,625)
+        self.a = 20
+        self.b = 40
+
+    def new_box(self):
+        if (self.x - xc)**2 + (self.y - yc)**2 <= 600**2:
+            self.id_ = canv.create_rectangle(self.x, self.y, self.x + self.a, self.y + self.b, fill='green', width=2)
+            box={'id': self.id_, 'x': self.x, 'y': self.y}
+            boxes.append(box)
+
+
 class Ball():
+    
     def __init__(self, x=400, y=325):
         
         self.x = x
         self.y = y
-        self.r = 2
+        self.r = 3
 
         self.live = 40
         self.vx = 40
@@ -56,6 +76,7 @@ class Ball():
                 self.y + self.r,
                 fill=self.color
         )
+
 
     def set_coords(self):
         canv.coords(
@@ -71,6 +92,42 @@ class Ball():
         self.x += self.vx
         self.y -= self.vy
         self.set_coords()    
+
+
+class Grenade():
+    
+    def __init__(self, x=400, y=325):
+        
+        self.x = x
+        self.y = y
+        self.r = 3
+        self.e = 3
+        self.live = 40
+        self.vx = 40
+        self.vy = 40
+        self.color = choice(['purple'])
+        self.id = canv.create_oval(
+                self.x - self.r,
+                self.y - self.r,
+                self.x + self.r,
+                self.y + self.r,
+                fill=self.color
+        )
+
+
+    def set_coords(self):
+        canv.coords(
+                self.id,
+                self.x - self.r,
+                self.y - self.r,
+                self.x + self.r,
+                self.y + self.r
+        )
+
+    def move(self):
+        self.x += self.vx
+        self.y -= self.vy
+        self.set_coords()
 
 
 class Player():
@@ -114,7 +171,37 @@ class Player():
                 self.y + self.a2,
                 fill='yellow'
         )
+
         
+    def check_position(self):           # HERE
+        global balls, screen1, enemys
+        
+        if (self.x - self.xc)**2 + (self.y - self.yc)**2 >= R**2:
+            
+            start_new_game()
+            time.sleep(2)
+            canv.delete(screen1)
+
+        
+    def check_minus_hp(self):
+        global enemys, hp, x_hp,  id_hp
+        
+        for e in enemys:
+            if (e['x'] - self.x)**2 + (e['y'] - self.y)**2 <= (self.a1 + e['r'])**2:
+                self.live -= 1
+                hp -= 1
+                x_hp -= 2
+                canv.itemconfig(id_hp_percents, text = str(hp) + '%')
+                canv.delete(id_hp)
+                id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
+                
+        if self.live == 0:
+            start_new_game()
+            time.sleep(2)
+            canv.delete(screen1)
+        
+   
+
     def set_coords2(self):
         canv.coords(
             self.id2,
@@ -123,6 +210,7 @@ class Player():
             self.x + self.a2,
             self.y + self.a2
         )
+    
     
     def set_coords1(self):
         canv.coords(
@@ -151,8 +239,7 @@ class Player():
 
 
     def fire2_end(self, event):
-        global balls, bullet
-        bullet += 1
+        global balls
         new_ball = Ball(self.x, self.y)
         new_ball.r += 5
         self.an = math.atan2((event.y-new_ball.y) , (event.x-new_ball.x))
@@ -160,8 +247,22 @@ class Player():
         new_ball.vy = - self.f2_power * math.sin(self.an)
         balls += [new_ball]
         self.f2_on = 0
-
         
+        
+    def fire1_start(self, event):
+        self.f2_on = 1
+
+
+    def fire1_end(self, event):
+        global grenades
+        new_gr = Grenade(self.x, self.y)
+        new_gr.r += 5
+        self.an = math.atan2((event.y-new_gr.y) , (event.x-new_gr.x))
+        new_gr.vx = self.f2_power * math.cos(self.an)
+        new_gr.vy = - self.f2_power * math.sin(self.an)
+        grenades += [new_gr]
+        self.f2_on = 0
+    
         
     def targetting(self, event=0):
         """Прицеливание. Зависит от положения мыши."""
@@ -179,7 +280,6 @@ class Player():
         k_y = math.sin(self.an)
         
         
-        
     def acceleration(self):
         global k_x, k_y
         #sina = (self.y-self.yc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2   )
@@ -191,6 +291,8 @@ class Player():
         self.vx +=self.ax*dt 
         self.vy +=self.ay*dt
         self.v = math.sqrt(self.vx**2 + self.vy**2)
+        
+        
     def move(self):
         global k_x, k_y
         #self.x += -k_y*self.v
@@ -200,19 +302,13 @@ class Player():
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
+        
+        
     def move_right(self, event):  
         global k_x, k_y
 
         self.vx+=-self.F*k_x/self.m
         self.vy+=self.F*k_y/self.m
-
-
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=self.F*k_y/self.m
-
-        self.x += -k_y*self.v
-        self.y += k_x*self.v
-
 
         self.set_coords1()
         self.set_coords2()
@@ -225,20 +321,14 @@ class Player():
         self.vx+=self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
 
-
-        self.vx+=self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-
-        self.x += k_y*self.v
-        self.y += -k_x*self.v
-
-
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
         
+        
     def move_up(self, event):
         global k_x, k_y
+        
         self.vx+=self.F*k_x/self.m
         self.vy+=self.F*k_y/self.m
         #self.x += k_x*self.v
@@ -247,20 +337,13 @@ class Player():
         self.set_coords2()
         self.set_coords3()
         
+        
     def move_down(self, event):
         global k_x, k_y
         
 
         self.vx+=-self.F*k_x/self.m
         self.vy+=-self.F*k_y/self.m
-
-
-        self.vx+=-self.F*k_x/self.m
-        self.vy+=-self.F*k_y/self.m
-        
-        self.x += -k_x*self.v
-        self.y += -k_y*self.v
-
 
         self.set_coords1()
         self.set_coords2()
@@ -328,17 +411,21 @@ def change_velocity_vy(vx, vy, x, y):
     
     return vy
 
+i0 = 0
 
 def new_enemy():
+    global i0
     x = rnd(100,700)
     y = rnd(100,500)
     r = rnd(10,15)
     vx=rnd(-6, 6)
     vy=rnd(-6, 6)
-    if (x - (x_0 + R))**2 + (y - (y_0 + R))**2 >= a**2 and (x - (x_0 + R))**2 + (y - (y_0 + R))**2 <= (R-40)**2 :
-        id_ = canv.create_oval( x - r, y - r, x + r, y + r,fill = 'black', width=0)
-        enemy={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy}
-        enemys.append(enemy)
+    if i0 < 8:
+        if (x - (x_0 + R))**2 + (y - (y_0 + R))**2 >= a**2 and (x - (x_0 + R))**2 + (y - (y_0 + R))**2 <= (R-40)**2 :
+            id_ = canv.create_oval( x - r, y - r, x + r, y + r,fill = 'black', width=0)
+            enemy={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy}
+            enemys.append(enemy)
+            i0+=1
     root.after(200,new_enemy)
 
 
@@ -357,11 +444,55 @@ def motion():
     root.after(20 , motion)
 
 
-balls = []
-bullet = 0
+gren = 5
+bull = 10
+a_box = 20
+b_box = 40
+
+def new_box():
+    x_box = rnd(100,700)
+    y_box = rnd(25,625)
+    if (x_box - xc)**2 + (y_box - yc)**2 <= R**2:
+        id_box = canv.create_rectangle(x_box, y_box, x_box + a_box, y_box + b_box, fill='green', width=2)
+        box={'id': id_box, 'x': x_box, 'y': y_box}
+        boxes.append(box)
+    root.after(5000,new_box)
+
+
+def start_new_game():    
+    
+    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents
+            
+    screen1 = canv.create_text(400, 300, text='GAME OVER', font = "Times 100 italic bold")
+    
+    for bb in balls:
+        canv.delete(bb.id)
+        balls=[]
+            
+    for e in enemys:
+        canv.delete(e['id'])
+        enemys = []
+                         
+    P1.x = 400
+    P1.y = 325
+    P1.vx = 0
+    P1.vy = 0
+    hp = 100
+    x_hp = 200
+    canv.delete(id_hp)
+    canv.delete(id_hp_percents)
+    id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
+    id_hp_percents = canv.create_text(25,90,text = str(hp) + '%' ,font = '28')
+    P1.set_coords1
+    P1.set_coords2
+    P1.set_coords3
+    P1.live = 100
+    all_points = 0
+    game_process()
+
 
 def game_process(event=''):
-    global balls, bullet, all_points
+    global balls, bullet, all_points, grenades, Rexp, i0
     root.bind('<Motion>', P1.targetting)
     root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
@@ -369,34 +500,55 @@ def game_process(event=''):
     root.bind('<Down>', P1.move_down)
     root.bind('<Button-1>', P1.fire2_start)
     root.bind('<ButtonRelease-1>', P1.fire2_end)
-    delete = []
+    root.bind('<Button-3>', P1.fire1_start)
+    root.bind('<ButtonRelease-3>', P1.fire1_end)
+    
     for b in balls:
         b.move()
         for k, e in enumerate(enemys):   
             if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
                 canv.delete(e['id'])
                 all_points +=1
+                i0-=1
                 del enemys[k]
         if b.live<=0:
             canv.delete(b.id)
         b.live+= -1
+    
+    
+    for g in grenades:
+        g.move()
+        for k, e in enumerate(enemys):   
+            if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.r + e['r'])**2:
+                canv.delete(e['id'])
+                all_points +=1
+                i0-=1
+                del enemys[k]
+                canv.delete(g.id)
+        if g.live<=0:
+            canv.delete(g.id)
+        g.live+= -1
+    
+        
     canv.itemconfig(id_points, text='Score:'+str(all_points))
     canv.update()
     P1.move()
     P1.acceleration()
     P1.targetting()
+    P1.check_position()
+    P1.check_minus_hp()
     time.sleep(0.03)
     
     root.after(3, game_process)
     
 create_objects()
+
          
 P1 = Player()
-
+new_box()
 game_process()
 new_enemy()
 motion()
 
 
 root.mainloop()
-
