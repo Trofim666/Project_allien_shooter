@@ -36,13 +36,17 @@ dt = 1
 w = 0.0002
 yc = 325
 xc = 500
+<<<<<<< HEAD
 a_box = 20
 b_box = 40
+=======
+>>>>>>> 07197e76c669dbadb67ad68f77ac68a433c125af
 
 enemys=[]
 grenades=[]
 balls=[]
 boxes = []
+
 
 def create_objects():
     canv.create_oval (x_0, y_0, x_0 + 2*R, y_0 + 2*R, outline="gray", fill="red", width=2)
@@ -473,6 +477,39 @@ def start_new_game():
     game_process()
 
 
+
+def start_new_game():    
+    
+    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents
+            
+    screen1 = canv.create_text(400, 300, text='GAME OVER', font = "Times 100 italic bold")
+    
+    for bb in balls:
+        canv.delete(bb.id)
+        balls=[]
+            
+    for e in enemys:
+        canv.delete(e['id'])
+        enemys = []
+                         
+    P1.x = 400
+    P1.y = 325
+    P1.vx = 0
+    P1.vy = 0
+    hp = 100
+    x_hp = 200
+    canv.delete(id_hp)
+    canv.delete(id_hp_percents)
+    id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
+    id_hp_percents = canv.create_text(25,90,text = str(hp) + '%' ,font = '28')
+    P1.set_coords1
+    P1.set_coords2
+    P1.set_coords3
+    P1.live = 100
+    all_points = 0
+    game_process()
+
+
 def game_process(event=''):
     global balls, all_points, grenades, Rexp, i0, bull, gren
     root.bind('<Motion>', P1.targetting)
@@ -482,6 +519,7 @@ def game_process(event=''):
     root.bind('<Down>', P1.move_down)
     root.bind('<Button-1>', P1.fire2_start)
     root.bind('<Button-3>', P1.fire1_start)
+<<<<<<< HEAD
 
     
     for k, bx in enumerate(boxes):
@@ -490,6 +528,10 @@ def game_process(event=''):
                 bull+=5
                 gren+=2
                 del boxes[k]
+=======
+    root.bind('<ButtonRelease-3>', P1.fire1_end)
+
+>>>>>>> 07197e76c669dbadb67ad68f77ac68a433c125af
     
     for b in balls:
         b.move()
