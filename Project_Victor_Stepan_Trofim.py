@@ -15,12 +15,21 @@ hp = 100
 x_hp = 200
 gren = 5
 bull = 15
+
+t_med = 20000
+t0_med = 0
+t_box = 20000
+t0_box = 14000
+
 id_points = canv.create_text(30,30,text = all_points,font = '28')
 id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
 id_hp_percents = canv.create_text(25,90,text = str(hp) + '%',font = '28')
 id_bullets = canv.create_text(730,30,text = bull,font = '28')
 id_grenades = canv.create_text(730,50,text = gren,font = '28')
-
+id_med_time1 = canv.create_text(725,90,text = 'Next ammunition:', font = '28')
+id_box_time1 = canv.create_text(725,130,text = 'Next aptechka:',font = '28')
+id_med_time2 = canv.create_text(725,110,text = (t_med//1000),font = '28')
+id_box_time2 = canv.create_text(725,150,text = (t_box//1000),font = '28')
 
 Rexp = 150
 k_x = 1
@@ -35,7 +44,7 @@ M = 1
 dt = 1
 w = 0.0002
 yc = 325
-xc = 500
+xc = 400
 
 a_box = 20
 b_box = 40
@@ -427,29 +436,61 @@ def motion():
     root.after(20 , motion)
 
 def new_box():
-    x_box = rnd(100,700)
-    y_box = rnd(25,625)
+    x_box = rnd(260,540)
+    y_box = rnd(185,465)
     if (x_box - xc)**2 + (y_box - yc)**2 <= a**2:
         id_box = canv.create_rectangle(x_box, y_box, x_box + a_box, y_box + b_box, fill='green', width=2)
         box={'id': id_box, 'x': x_box, 'y': y_box}
         boxes.append(box)
-    root.after(5000,new_box)
+    #root.after(t_box,new_box)
     
     
 def new_aptechka():
-    x_box = rnd(100,700)
-    y_box = rnd(25,625)
+    x_box = rnd(260,540)
+    y_box = rnd(185,465)
     if (x_box - xc)**2 + (y_box - yc)**2 <= a**2:
         id_med = canv.create_rectangle(x_box, y_box, x_box + a_box, y_box + b_box, fill='aqua', width=2)
         med={'id': id_med, 'x': x_box, 'y': y_box}
         medes.append(med)
-    root.after(5000,new_aptechka)
+
+def time_of_medicaments():
+    global t0_med, id_med_time2, t_med
+    t0_med+=1000
+    if t_med - t0_med >= 10000:
+        canv.delete(id_med_time2)
+        id_med_time2 = canv.create_text(725,150,text = '00:' + str((t_med-t0_med)//1000), font = '32')
+    elif t_med - t0_med > 0:
+        canv.delete(id_med_time2)
+        id_med_time2 = canv.create_text(725,150,text = '00:0' + str((t_med-t0_med)//1000), font = '32')
+    elif t_med - t0_med == 0:
+        t0_med = 0
+        canv.delete(id_med_time2)
+        id_med_time2 = canv.create_text(725,150,text = '00:00', font = '32')
+        new_aptechka()
+    root.after(1000,time_of_medicaments)
+
+
+def time_of_boxes():
+    global t0_box, id_box_time2, t_box
+    t0_box+=1000
+    if t_box - t0_box >= 10000:
+        canv.delete(id_box_time2)
+        id_box_time2 = canv.create_text(725,110,text = '00:' + str((t_box-t0_box)//1000), font = '32')
+    elif t_box - t0_box > 0:
+        canv.delete(id_box_time2)
+        id_box_time2 = canv.create_text(725,110,text = '00:0' + str((t_box-t0_box)//1000), font = '32')
+    elif t_box - t0_box == 0:
+        t0_box = 0
+        canv.delete(id_box_time2)
+        id_box_time2 = canv.create_text(725,110,text = '00:00', font = '32')
+        new_box()
+    root.after(1000,time_of_boxes)
 
 
 
 def start_new_game():    
     
-    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents
+    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents, boxes, medes, bull, gren, i0, t0_med
             
     screen1 = canv.create_text(400, 300, text='GAME OVER', font = "Times 100 italic bold")
     
@@ -477,6 +518,8 @@ def start_new_game():
     gren = 5
     hp = 100
     x_hp = 200
+    i0 = 0
+    t0_med = 0
     canv.delete(id_hp)
     canv.delete(id_hp_percents)
     id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
@@ -564,10 +607,10 @@ create_objects()
 
          
 P1 = Player()
+time_of_medicaments()
+time_of_boxes()
 game_process()
-new_box()
 new_enemy()
-new_aptechka()
 motion()
 
 
