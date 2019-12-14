@@ -13,9 +13,14 @@ canv.pack(fill=tk.BOTH, expand=1)
 all_points = 0
 hp = 100
 x_hp = 200
+gren = 5
+bull = 10
 id_points = canv.create_text(30,30,text = all_points,font = '28')
 id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
 id_hp_percents = canv.create_text(25,90,text = str(hp) + '%',font = '28')
+id_bullets = canv.create_text(730,30,text = bull,font = '28')
+id_grenades = canv.create_text(730,50,text = gren,font = '28')
+
 
 Rexp = 150
 k_x = 1
@@ -28,9 +33,14 @@ R = 300
 a = 200
 M = 1
 dt = 1
-w = 0.02
+w = 0.0002
 yc = 325
 xc = 500
+<<<<<<< HEAD
+a_box = 20
+b_box = 40
+=======
+>>>>>>> 07197e76c669dbadb67ad68f77ac68a433c125af
 
 enemys=[]
 grenades=[]
@@ -41,22 +51,6 @@ boxes = []
 def create_objects():
     canv.create_oval (x_0, y_0, x_0 + 2*R, y_0 + 2*R, outline="gray", fill="red", width=2)
     canv.create_oval (x_0 + R-a, y_0 + R-a, x_0 + R + a, y_0 + R+a, fill="white", width=2)
-
-
-class Box():
-    def __init__(self):
-        self.gr = 5
-        self.bl = 10
-        self.x = rnd(100,700)
-        self.y = rnd(25,625)
-        self.a = 20
-        self.b = 40
-
-    def new_box(self):
-        if (self.x - xc)**2 + (self.y - yc)**2 <= 600**2:
-            self.id_ = canv.create_rectangle(self.x, self.y, self.x + self.a, self.y + self.b, fill='green', width=2)
-            box={'id': self.id_, 'x': self.x, 'y': self.y}
-            boxes.append(box)
 
 
 class Ball():
@@ -136,10 +130,8 @@ class Player():
     
     def __init__(self, ):
         self.f2_power = 20
-        self.f2_on = 0
         self.x = 400
         self.y = 325
-
         self.live = 100
         self.ay = 0
         self.ax = 0
@@ -201,7 +193,6 @@ class Player():
             start_new_game()
             time.sleep(2)
             canv.delete(screen1)
-        
    
 
     def set_coords2(self):
@@ -235,37 +226,30 @@ class Player():
             self.y + self.l*k_y
         )
 
-
     def fire2_start(self, event):
-        self.f2_on = 1
+        global balls, bull
+        if bull > 0:
+            new_ball = Ball(self.x, self.y)
+            new_ball.r += 5
+            bull-=1
+            self.an = math.atan2((event.y-new_ball.y) , (event.x-new_ball.x))
+            new_ball.vx = self.f2_power * math.cos(self.an)
+            new_ball.vy = - self.f2_power * math.sin(self.an)
+            balls += [new_ball]
 
 
-    def fire2_end(self, event):
-        global balls
-        new_ball = Ball(self.x, self.y)
-        new_ball.r += 5
-        self.an = math.atan2((event.y-new_ball.y) , (event.x-new_ball.x))
-        new_ball.vx = self.f2_power * math.cos(self.an)
-        new_ball.vy = - self.f2_power * math.sin(self.an)
-        balls += [new_ball]
-        self.f2_on = 0
-        
-        
     def fire1_start(self, event):
-        self.f2_on = 1
+        global grenades, gren
+        if gren > 0:
+            new_gr = Grenade(self.x, self.y)
+            new_gr.r += 5
+            gren -=1
+            self.an = math.atan2((event.y-new_gr.y) , (event.x-new_gr.x))
+            new_gr.vx = self.f2_power * math.cos(self.an)
+            new_gr.vy = - self.f2_power * math.sin(self.an)
+            grenades += [new_gr]
 
-
-    def fire1_end(self, event):
-        global grenades
-        new_gr = Grenade(self.x, self.y)
-        new_gr.r += 5
-        self.an = math.atan2((event.y-new_gr.y) , (event.x-new_gr.x))
-        new_gr.vx = self.f2_power * math.cos(self.an)
-        new_gr.vy = - self.f2_power * math.sin(self.an)
-        grenades += [new_gr]
-        self.f2_on = 0
-    
-        
+ 
     def targetting(self, event=0):
         """Прицеливание. Зависит от положения мыши."""
         global k_x, k_y
@@ -454,7 +438,7 @@ b_box = 40
 def new_box():
     x_box = rnd(100,700)
     y_box = rnd(25,625)
-    if (x_box - xc)**2 + (y_box - yc)**2 <= R**2:
+    if (x_box - xc)**2 + (y_box - yc)**2 <= a**2:
         id_box = canv.create_rectangle(x_box, y_box, x_box + a_box, y_box + b_box, fill='green', width=2)
         box={'id': id_box, 'x': x_box, 'y': y_box}
         boxes.append(box)
@@ -527,17 +511,27 @@ def start_new_game():
 
 
 def game_process(event=''):
-    global balls, bullet, all_points, grenades, Rexp, i0
+    global balls, all_points, grenades, Rexp, i0, bull, gren
     root.bind('<Motion>', P1.targetting)
     root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
     root.bind('<Up>', P1.move_up)
     root.bind('<Down>', P1.move_down)
     root.bind('<Button-1>', P1.fire2_start)
-    root.bind('<ButtonRelease-1>', P1.fire2_end)
     root.bind('<Button-3>', P1.fire1_start)
+<<<<<<< HEAD
+
+    
+    for k, bx in enumerate(boxes):
+        if (P1.x-bx['x'])**2 + (P1.y-bx['y'])**2 <= (P1.a1 + a_box)**2:
+                canv.delete(bx['id'])
+                bull+=5
+                gren+=2
+                del boxes[k]
+=======
     root.bind('<ButtonRelease-3>', P1.fire1_end)
 
+>>>>>>> 07197e76c669dbadb67ad68f77ac68a433c125af
     
     for b in balls:
         b.move()
@@ -565,7 +559,8 @@ def game_process(event=''):
             canv.delete(g.id)
         g.live+= -1
     
-        
+    canv.itemconfig(id_bullets, text='Bullets:'+str(bull))
+    canv.itemconfig(id_grenades, text='Grenades:'+str(gren))    
     canv.itemconfig(id_points, text='Score:'+str(all_points))
     canv.update()
     P1.move()
@@ -581,10 +576,11 @@ create_objects()
 
          
 P1 = Player()
-new_box()
 game_process()
+new_box()
 new_enemy()
 motion()
 
 
 root.mainloop()
+
