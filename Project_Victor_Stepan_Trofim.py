@@ -14,7 +14,7 @@ all_points = 0
 hp = 100
 x_hp = 200
 gren = 5
-bull = 10
+bull = 15
 id_points = canv.create_text(30,30,text = all_points,font = '28')
 id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
 id_hp_percents = canv.create_text(25,90,text = str(hp) + '%',font = '28')
@@ -36,17 +36,14 @@ dt = 1
 w = 0.0002
 yc = 325
 xc = 500
-<<<<<<< HEAD
+
 a_box = 20
 b_box = 40
-=======
->>>>>>> 07197e76c669dbadb67ad68f77ac68a433c125af
-
 enemys=[]
 grenades=[]
 balls=[]
 boxes = []
-
+medes = []
 
 def create_objects():
     canv.create_oval (x_0, y_0, x_0 + 2*R, y_0 + 2*R, outline="gray", fill="red", width=2)
@@ -188,7 +185,7 @@ class Player():
                 canv.itemconfig(id_hp_percents, text = str(hp) + '%')
                 canv.delete(id_hp)
                 id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
-                
+        
         if self.live == 0:
             start_new_game()
             time.sleep(2)
@@ -429,12 +426,6 @@ def motion():
         canv.move(e['id'], e['vx'], e['vy'])
     root.after(20 , motion)
 
-
-gren = 5
-bull = 10
-a_box = 20
-b_box = 40
-
 def new_box():
     x_box = rnd(100,700)
     y_box = rnd(25,625)
@@ -443,38 +434,16 @@ def new_box():
         box={'id': id_box, 'x': x_box, 'y': y_box}
         boxes.append(box)
     root.after(5000,new_box)
-
-
-def start_new_game():    
     
-    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents
-            
-    screen1 = canv.create_text(400, 300, text='GAME OVER', font = "Times 100 italic bold")
     
-    for bb in balls:
-        canv.delete(bb.id)
-        balls=[]
-            
-    for e in enemys:
-        canv.delete(e['id'])
-        enemys = []
-                         
-    P1.x = 400
-    P1.y = 325
-    P1.vx = 0
-    P1.vy = 0
-    hp = 100
-    x_hp = 200
-    canv.delete(id_hp)
-    canv.delete(id_hp_percents)
-    id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
-    id_hp_percents = canv.create_text(25,90,text = str(hp) + '%' ,font = '28')
-    P1.set_coords1
-    P1.set_coords2
-    P1.set_coords3
-    P1.live = 100
-    all_points = 0
-    game_process()
+def new_aptechka():
+    x_box = rnd(100,700)
+    y_box = rnd(25,625)
+    if (x_box - xc)**2 + (y_box - yc)**2 <= a**2:
+        id_med = canv.create_rectangle(x_box, y_box, x_box + a_box, y_box + b_box, fill='aqua', width=2)
+        med={'id': id_med, 'x': x_box, 'y': y_box}
+        medes.append(med)
+    root.after(5000,new_aptechka)
 
 
 
@@ -491,11 +460,21 @@ def start_new_game():
     for e in enemys:
         canv.delete(e['id'])
         enemys = []
-                         
+    
+    for bx in boxes:
+        canv.delete(bx['id'])
+        boxes = []
+    
+    for mx in medes:
+        canv.delete(mx['id'])
+        medes = []
+    
     P1.x = 400
     P1.y = 325
     P1.vx = 0
     P1.vy = 0
+    bull = 15
+    gren = 5
     hp = 100
     x_hp = 200
     canv.delete(id_hp)
@@ -511,7 +490,7 @@ def start_new_game():
 
 
 def game_process(event=''):
-    global balls, all_points, grenades, Rexp, i0, bull, gren
+    global balls, all_points, grenades, Rexp, i0, bull, gren, hp, x_hp, id_hp_percents, id_hp
     root.bind('<Motion>', P1.targetting)
     root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
@@ -519,7 +498,6 @@ def game_process(event=''):
     root.bind('<Down>', P1.move_down)
     root.bind('<Button-1>', P1.fire2_start)
     root.bind('<Button-3>', P1.fire1_start)
-<<<<<<< HEAD
 
     
     for k, bx in enumerate(boxes):
@@ -528,10 +506,20 @@ def game_process(event=''):
                 bull+=5
                 gren+=2
                 del boxes[k]
-=======
-    root.bind('<ButtonRelease-3>', P1.fire1_end)
-
->>>>>>> 07197e76c669dbadb67ad68f77ac68a433c125af
+                
+    for k, mx in enumerate(medes):
+        if (P1.x-mx['x'])**2 + (P1.y-mx['y'])**2 <= (P1.a1 + a_box)**2:
+                canv.delete(mx['id'])
+                if hp+20<=100:
+                    hp+=20
+                    x_hp+=40
+                elif hp+20>100:
+                    hp = 100
+                    x_hp=200
+                canv.itemconfig(id_hp_percents, text = str(hp) + '%')
+                canv.delete(id_hp)
+                id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
+                del medes[k]
     
     for b in balls:
         b.move()
@@ -579,6 +567,7 @@ P1 = Player()
 game_process()
 new_box()
 new_enemy()
+new_aptechka()
 motion()
 
 
