@@ -4,6 +4,11 @@ import tkinter as tk
 import math
 import time
 import graphics as gr
+import mp3play
+
+filename = r'01.mp3'
+clip = mp3play.load(filename)
+
 
 root = tk.Tk()
 fr = tk.Frame(root)
@@ -20,6 +25,17 @@ t_med = 20000
 t0_med = 0
 t_box = 20000
 t0_box = 14000
+
+id_easy = canv.create_rectangle(10, 600, 110, 635, fill='lime', width = 2)
+id_medium = canv.create_rectangle(10, 560, 110, 590, fill='gold', width = 2)
+id_hard = canv.create_rectangle(10, 520, 110, 550, fill='orangered', width = 2)
+id_ultrahard = canv.create_rectangle(10, 480, 110, 510, fill='maroon', width = 2)
+
+
+id_easy_text = canv.create_text(60, 615, text = 'Easy', font = '36')
+id_medium_text = canv.create_text(60, 575, text = 'Medium', font = '36')
+id_hard_text = canv.create_text(60, 535, text = 'Hard', font = '36')
+id_ultrahard_text = canv.create_text(60, 495, text = 'Ultrahard', font = '36')
 
 id_points = canv.create_text(30,30,text = all_points,font = '28')
 id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
@@ -435,6 +451,7 @@ def motion():
         canv.move(e['id'], e['vx'], e['vy'])
     root.after(20 , motion)
 
+
 def new_box():
     x_box = rnd(260,540)
     y_box = rnd(185,465)
@@ -443,8 +460,8 @@ def new_box():
         box={'id': id_box, 'x': x_box, 'y': y_box}
         boxes.append(box)
     #root.after(t_box,new_box)
-    
-    
+
+
 def new_aptechka():
     x_box = rnd(260,540)
     y_box = rnd(185,465)
@@ -490,7 +507,7 @@ def time_of_boxes():
 
 def start_new_game():    
     
-    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents, boxes, medes, bull, gren, i0, t0_med
+    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents, boxes, medes, bull, gren, i0, t0_med, t0_box
             
     screen1 = canv.create_text(400, 300, text='GAME OVER', font = "Times 100 italic bold")
     
@@ -519,6 +536,7 @@ def start_new_game():
     hp = 100
     x_hp = 200
     i0 = 0
+    t0_box = 14000
     t0_med = 0
     canv.delete(id_hp)
     canv.delete(id_hp_percents)
@@ -605,6 +623,12 @@ def game_process(event=''):
     
 create_objects()
 
+
+clip.play() 
+# Let it play for up to 30 seconds, then stop it.
+#import time
+#time.sleep(min(30, clip.seconds()))
+#clip.stop()
          
 P1 = Player()
 time_of_medicaments()
