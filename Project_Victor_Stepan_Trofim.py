@@ -9,12 +9,22 @@ import mp3play
 filename = r'01.mp3'
 filename1 = r'1-kill.mp3'
 filename2 = r'2-kill.mp3'
+filename3 = r'3-kill.mp3'
+filename4 = r'4-kill.mp3'
+filename_box = r'box.mp3'
+filename_no_bull = r'nobullets.mp3'
+filename_minus_hp = r'minus_hp.mp3'
+
 clip = mp3play.load(filename)
 clip1 = mp3play.load(filename1)
 clip2 = mp3play.load(filename2)
-#clip3 = 
+clip3 = mp3play.load(filename3)
+clip4 = mp3play.load(filename4)
+clip_box = mp3play.load(filename_box)
+clip_no_bull = mp3play.load(filename_no_bull)
+clip_minus_hp = mp3play.load(filename_minus_hp)
 
-clip_r = [clip1, clip2]
+clip_r = [clip1, clip2, clip3, clip4]
 root = tk.Tk()
 fr = tk.Frame(root)
 root.geometry('800x650')
@@ -207,7 +217,7 @@ class Player():
                 canv.itemconfig(id_hp_percents, text = str(hp) + '%')
                 canv.delete(id_hp)
                 id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
-        
+
         if self.live == 0 or (self.x - self.xc)**2 + (self.y - self.yc)**2 >= R**2:
             start_new_game()
             #time.sleep(2)
@@ -255,7 +265,8 @@ class Player():
             new_ball.vx = self.f2_power * math.cos(self.an)
             new_ball.vy = - self.f2_power * math.sin(self.an)
             balls += [new_ball]
-
+        elif bull == 0:
+            clip_no_bull.play()
 
     def fire1_start(self, event):
         global grenades, gren
@@ -535,6 +546,8 @@ def start_new_game():
     i0 = 0
     t0_box = 14000
     t0_med = 0
+    clip.stop()
+    clip.play()
     canv.delete(id_hp)
     canv.delete(id_hp_percents)
     id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
@@ -544,12 +557,11 @@ def start_new_game():
     P1.set_coords3
     P1.live = 100
     all_points = 0
-    time.sleep(2)
     canv.delete(screen1)
 
 
 def game_process(event=''):
-    global balls, all_points, grenades, Rexp, i0, bull, gren, hp, x_hp, id_hp_percents, id_hp, streak, xc, yc, r_0, clip_r
+    global balls, all_points, grenades, Rexp, i0, bull, gren, hp, x_hp, id_hp_percents, id_hp, streak, xc, yc, clip_r, clip_box
     root.bind('<Motion>', P1.targetting)
     root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
@@ -564,6 +576,7 @@ def game_process(event=''):
                 canv.delete(bx['id'])
                 bull+=5
                 gren+=2
+                clip_box.play()
                 del boxes[k]
                 
     for k, mx in enumerate(medes):
@@ -585,7 +598,7 @@ def game_process(event=''):
         for k, e in enumerate(enemys):   
             if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
                 canv.delete(e['id'])
-                r_0 = rnd(0,2)
+                r_0 = rnd(0,4)
                 clip_r[r_0].play()
                 all_points +=1
                 i0-=1
