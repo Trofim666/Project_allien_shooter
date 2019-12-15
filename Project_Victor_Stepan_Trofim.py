@@ -7,9 +7,14 @@ import graphics as gr
 import mp3play
 
 filename = r'01.mp3'
+filename1 = r'1-kill.mp3'
+filename2 = r'2-kill.mp3'
 clip = mp3play.load(filename)
+clip1 = mp3play.load(filename1)
+clip2 = mp3play.load(filename2)
+#clip3 = 
 
-
+clip_r = [clip1, clip2]
 root = tk.Tk()
 fr = tk.Frame(root)
 root.geometry('800x650')
@@ -47,6 +52,7 @@ id_box_time1 = canv.create_text(725,130,text = 'Next aptechka:',font = '28')
 id_med_time2 = canv.create_text(725,110,text = (t_med//1000),font = '28')
 id_box_time2 = canv.create_text(725,150,text = (t_box//1000),font = '28')
 
+streak = 0
 Rexp = 150
 k_x = 1
 k_y = 1 
@@ -188,15 +194,6 @@ class Player():
                 fill='yellow'
         )
 
-        
-    def check_position(self):           # HERE
-        global balls, screen1, enemys
-        
-        if (self.x - self.xc)**2 + (self.y - self.yc)**2 >= R**2:
-            
-            start_new_game()
-            time.sleep(2)
-            canv.delete(screen1)
 
         
     def check_minus_hp(self):
@@ -211,10 +208,10 @@ class Player():
                 canv.delete(id_hp)
                 id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
         
-        if self.live == 0:
+        if self.live == 0 or (self.x - self.xc)**2 + (self.y - self.yc)**2 >= R**2:
             start_new_game()
-            time.sleep(2)
-            canv.delete(screen1)
+            #time.sleep(2)
+            #canv.delete(screen1)
    
 
     def set_coords2(self):
@@ -547,11 +544,12 @@ def start_new_game():
     P1.set_coords3
     P1.live = 100
     all_points = 0
-    game_process()
+    time.sleep(2)
+    canv.delete(screen1)
 
 
 def game_process(event=''):
-    global balls, all_points, grenades, Rexp, i0, bull, gren, hp, x_hp, id_hp_percents, id_hp
+    global balls, all_points, grenades, Rexp, i0, bull, gren, hp, x_hp, id_hp_percents, id_hp, streak, xc, yc, r_0, clip_r
     root.bind('<Motion>', P1.targetting)
     root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
@@ -587,12 +585,14 @@ def game_process(event=''):
         for k, e in enumerate(enemys):   
             if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
                 canv.delete(e['id'])
+                r_0 = rnd(0,2)
+                clip_r[r_0].play()
                 all_points +=1
                 i0-=1
                 del enemys[k]
         if b.live<=0:
             canv.delete(b.id)
-        b.live+= -1
+    
     
     
     for g in grenades:
@@ -615,7 +615,6 @@ def game_process(event=''):
     P1.move()
     P1.acceleration()
     P1.targetting()
-    P1.check_position()
     P1.check_minus_hp()
     time.sleep(0.03)
     
@@ -624,7 +623,7 @@ def game_process(event=''):
 create_objects()
 
 
-clip.play() 
+#clip.play() 
 # Let it play for up to 30 seconds, then stop it.
 #import time
 #time.sleep(min(30, clip.seconds()))
@@ -639,4 +638,3 @@ motion()
 
 
 root.mainloop()
-
