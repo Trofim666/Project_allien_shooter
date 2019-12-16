@@ -31,7 +31,7 @@ t_box = 20000
 t0_box = 14000
 
 deltav = 10
-boundv = 2
+boundv = 1
 
 id_easy = canv.create_rectangle(10, 600, 110, 635, fill='lime', width = 2)
 id_medium = canv.create_rectangle(10, 560, 110, 590, fill='gold', width = 2)
