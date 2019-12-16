@@ -7,9 +7,7 @@ import graphics as gr
 import mp3play
 
 filename = r'01.mp3'
-filename00 = r'na.mp3'
-filename01 = r'za_pushku.mp3'
-filename02 = r'1-kill.mp3'
+filename1 = r'1-kill.mp3'
 filename2 = r'2-kill.mp3'
 filename3 = r'3-kill.mp3'
 filename4 = r'4-kill.mp3'
@@ -326,8 +324,7 @@ class Player():
             self.vx+= -boundv*math.cos(self.an)
             self.vy+= -boundv*math.sin(self.an)
             balls += [new_ball]
-        elif bull == 0:
-            clip_no_bull.play()
+
 
     def fire1_start(self, event):
         global grenades, gren
@@ -575,7 +572,7 @@ def time_of_boxes():
 
 def start_new_game():    
     
-    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents, boxes, medes, bull, gren, i0, t0_med, t0_box, streak
+    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents, boxes, medes, bull, gren, i0, t0_med, t0_box
             
     screen1 = canv.create_text(400, 300, text='GAME OVER', font = "Times 100 italic bold")
     
@@ -635,7 +632,6 @@ def game_process(event=''):
                 canv.delete(bx['id'])
                 bull+=5
                 gren+=2
-                clip_box.play()
                 del boxes[k]
                 
     for k, mx in enumerate(medes):
@@ -686,11 +682,8 @@ def game_process(event=''):
                     all_points +=5
                 i0-=1
                 del enemys[k]
-        if b.live == 1:
-            streak=0
         if b.live<=0:
             canv.delete(b.id)
-        b.live-=1
     
     
     delete=[]
@@ -715,8 +708,6 @@ def game_process(event=''):
                 g.vx = 0
                 g.vy = 0
                 g.live = 0
-
-
         if g.live<=0:
             canv.delete(g.id)
         else:
