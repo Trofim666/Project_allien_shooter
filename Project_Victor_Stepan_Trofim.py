@@ -19,25 +19,45 @@ filename_box = r'box.mp3'
 filename_no_bull = r'nobullets.mp3'
 filename_minus_hp = r'minus_hp.mp3'
 
+filename = r'05.mp3'
+filename00 = r'na.mp3'
+filename01 = r'za_pushku.mp3'
+filename02 = r'1-kill.mp3'
+filename03 = r'valera.mp3'
+filename2 = r'2-kill.mp3'
+filename3 = r'3-kill.mp3'
+filename4 = r'4-kill.mp3'
+filename5 = r'5-kill.mp3'
+filename6 = r'6-kill.mp3'
+filename7 = r'7-kill.mp3'
+filename_box = r'box.mp3'
+filename_no_bull = r'nobullets.mp3'
+filename_minus_hp = r'minus_hp.mp3'
+filename_med = r'hill.mp3'
+
 clip = mp3play.load(filename)
 clip00 = mp3play.load(filename00)
 clip01 = mp3play.load(filename01)
 clip02 = mp3play.load(filename02)
+clip03 = mp3play.load(filename03)
 clip2 = mp3play.load(filename2)
 clip3 = mp3play.load(filename3)
 clip4 = mp3play.load(filename4)
 clip5 = mp3play.load(filename5)
 clip6 = mp3play.load(filename6)
-#clip7 =
+clip7 = mp3play.load(filename7)
 #clip8 =
 
 
 clip_box = mp3play.load(filename_box)
 clip_no_bull = mp3play.load(filename_no_bull)
 clip_minus_hp = mp3play.load(filename_minus_hp)
-clip_r0 = [clip00, clip01, clip02]
+clip_med = mp3play.load(filename_med)
+
+clip_r0 = [clip00, clip01, clip02, clip03]
 clip_r = [clip2, clip3, clip4, clip5]
-clip_r5 = [clip6]
+clip_r5 = [clip6, clip7]
+
 root = tk.Tk()
 fr = tk.Frame(root)
 root.geometry('800x650')
@@ -53,6 +73,9 @@ t_med = 20000
 t0_med = 0
 t_box = 20000
 t0_box = 14000
+
+deltav = 10
+boundv = 1
 
 id_easy = canv.create_rectangle(10, 600, 110, 635, fill='lime', width = 2)
 id_medium = canv.create_rectangle(10, 560, 110, 590, fill='gold', width = 2)
@@ -75,6 +98,7 @@ id_box_time1 = canv.create_text(725,130,text = 'Next aptechka:',font = '28')
 id_med_time2 = canv.create_text(725,110,text = (t_med//1000),font = '28')
 id_box_time2 = canv.create_text(725,150,text = (t_box//1000),font = '28')
 
+trigger = 0
 streak = 0
 Rexp = 150
 k_x = 1
@@ -111,7 +135,10 @@ class Ball():
         self.x = x
         self.y = y
         self.r = 3
-        self.live = 20
+        
+        
+
+        self.live = 40
         self.vx = 40
         self.vy = 40
         self.color = choice(['blue', 'green', 'red', 'brown'])
@@ -137,21 +164,22 @@ class Ball():
     def move(self):
         self.x += self.vx
         self.y -= self.vy
-        self.set_coords()    
+        self.set_coords() 
 
 
 class Grenade():
     
     def __init__(self, x=400, y=325):
-        
+        self.r0 = 3
+        self.bangtime = 4
         self.x = x
         self.y = y
-        self.r = 3
+        self.r = 5
         self.e = 3
         self.live = 40
         self.vx = 40
         self.vy = 40
-        self.color = choice(['purple'])
+        self.color =['purple']
         self.id = canv.create_oval(
                 self.x - self.r,
                 self.y - self.r,
@@ -159,6 +187,7 @@ class Grenade():
                 self.y + self.r,
                 fill=self.color
         )
+
 
 
     def set_coords(self):
@@ -174,6 +203,23 @@ class Grenade():
         self.x += self.vx
         self.y -= self.vy
         self.set_coords()
+        
+    
+    def blowup(self):
+        for i in range(self.bangtime):
+            self.r0+=10
+            boom = canv.create_oval(
+                self.x - self.r0,
+                self.y - self.r0,
+                self.x + self.r0,
+                self.y + self.r0,
+                fill='orange'
+            )
+            canv.update()
+            time.sleep(0.06)
+            canv.delete(boom)
+            
+        
 
 
 class Player():
@@ -219,17 +265,18 @@ class Player():
 
         
     def check_minus_hp(self):
-        global enemys, hp, x_hp,  id_hp
+        global enemys, hp, x_hp,  id_hp, trigger
         
         for e in enemys:
             if (e['x'] - self.x)**2 + (e['y'] - self.y)**2 <= (self.a1 + e['r'])**2:
                 self.live -= 1
                 hp -= 1
                 x_hp -= 2
+                trigger = 1
                 canv.itemconfig(id_hp_percents, text = str(hp) + '%')
                 canv.delete(id_hp)
                 id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
-
+        
         if self.live == 0 or (self.x - self.xc)**2 + (self.y - self.yc)**2 >= R**2:
             start_new_game()
             #time.sleep(2)
@@ -276,6 +323,8 @@ class Player():
             self.an = math.atan2((event.y-new_ball.y) , (event.x-new_ball.x))
             new_ball.vx = self.f2_power * math.cos(self.an)
             new_ball.vy = - self.f2_power * math.sin(self.an)
+            self.vx+= -boundv*math.cos(self.an)
+            self.vy+= -boundv*math.sin(self.an)
             balls += [new_ball]
         elif bull == 0:
             clip_no_bull.play()
@@ -293,7 +342,6 @@ class Player():
 
  
     def targetting(self, event=0):
-        """Прицеливание. Зависит от положения мыши."""
         global k_x, k_y
         
         if event:
@@ -553,14 +601,11 @@ def start_new_game():
     P1.vy = 0
     bull = 15
     gren = 5
-    streak=0
     hp = 100
     x_hp = 200
     i0 = 0
     t0_box = 14000
     t0_med = 0
-    clip.stop()
-    clip.play()
     canv.delete(id_hp)
     canv.delete(id_hp_percents)
     id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
@@ -570,11 +615,12 @@ def start_new_game():
     P1.set_coords3
     P1.live = 100
     all_points = 0
+    time.sleep(2)
     canv.delete(screen1)
 
 
 def game_process(event=''):
-    global balls, all_points, grenades, Rexp, i0, bull, gren, hp, x_hp, id_hp_percents, id_hp, streak, xc, yc, clip_r, clip_box, clip_r0, clip_r5
+    global balls, all_points, grenades, Rexp, i0, bull, gren, hp, x_hp, id_hp_percents, id_hp, streak, xc, yc, clip_r, clip_box, clip_r0, clip_r5, trigger
     root.bind('<Motion>', P1.targetting)
     root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
@@ -604,6 +650,7 @@ def game_process(event=''):
                 canv.itemconfig(id_hp_percents, text = str(hp) + '%')
                 canv.delete(id_hp)
                 id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
+                clip_med.play()
                 del medes[k]
     
     for b in balls:
@@ -611,8 +658,8 @@ def game_process(event=''):
         for k, e in enumerate(enemys):   
             if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
                 canv.delete(e['id'])
-                r_0 = rnd(0,3)
-                r_01 = rnd(0,1)
+                r_0 = rnd(0,4)
+                r_01 = rnd(0,2)
                 b.x = 0
                 b.y = 0
                 b.vx = 0
@@ -646,19 +693,35 @@ def game_process(event=''):
         b.live-=1
     
     
-    
+    delete=[]
     for g in grenades:
         g.move()
         for k, e in enumerate(enemys):   
-            if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.r + e['r'])**2:
+            if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.r+e['r'])**2 :
                 canv.delete(e['id'])
-                all_points +=1
-                i0-=1
-                del enemys[k]
                 canv.delete(g.id)
+                g.blowup()
+                for kk, e in enumerate(enemys):   
+                    if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= 75**2 :
+                        canv.delete(e['id'])
+                        all_points +=1
+                        i0-=1
+                        del enemys[kk]
+                for bb in enemys:
+                    bb['vx']+= deltav*R*(bb['x'] - g.x)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
+                    bb['vy']+= deltav*R*(bb['y'] - g.y)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
+                g.x = 0
+                g.y = 0
+                g.vx = 0
+                g.vy = 0
+                g.live = 0
+
+
         if g.live<=0:
             canv.delete(g.id)
-        g.live+= -1
+        else:
+            g.live+= -1
+        
     
     canv.itemconfig(id_bullets, text='Bullets:'+str(bull))
     canv.itemconfig(id_grenades, text='Grenades:'+str(gren))    
@@ -668,6 +731,9 @@ def game_process(event=''):
     P1.acceleration()
     P1.targetting()
     P1.check_minus_hp()
+    #if trigger == 1 and not clip_minus_hp.play():
+        #clip_minus_hp.play()
+        #trigger=0
     time.sleep(0.03)
     
     root.after(3, game_process)
