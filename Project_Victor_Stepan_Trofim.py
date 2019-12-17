@@ -6,12 +6,14 @@ import time
 import graphics as gr
 import mp3play 
 
-filename_1_easy = r'easy-1.mp3'
+filename_1_easy = r'easy-3.mp3'
 filename_2_easy = r'easy-2.mp3'
-filename_1_medium = r'medium-1.mp3'
-filename_2_medium = r'medium-2.mp3'
+filename_1_medium = r'medium-3.mp3'
+filename_2_medium = r'medium-4.mp3'
 filename_1_hard = r'hard-1.mp3'
 filename_2_hard = r'hard-2.mp3'
+filename_1_ultrahard = r'ultrahard-1.mp3'
+filename_2_ultrahard = r'ultrahard-2.mp3'
 
 clip_1_easy = mp3play.load(filename_1_easy)
 clip_2_easy = mp3play.load(filename_2_easy)
@@ -19,9 +21,11 @@ clip_1_medium = mp3play.load(filename_1_medium)
 clip_2_medium = mp3play.load(filename_2_medium)
 clip_1_hard = mp3play.load(filename_1_hard)
 clip_2_hard = mp3play.load(filename_2_hard)
+clip_1_ultrahard = mp3play.load(filename_1_ultrahard)
+clip_2_ultrahard = mp3play.load(filename_2_ultrahard)
 
 filename00 = r'davit.mp3'
-filename01 = r'za_pushku.mp3'
+filename01 = r'ud3.mp3'
 filename02 = r'1-kill.mp3'
 filename03 = r'valera.mp3'
 
@@ -75,7 +79,7 @@ clip_no_gren = mp3play.load(filename_no_gren)
 clip_game_level_easy = [clip_1_easy, clip_2_easy]
 clip_game_level_medium = [clip_1_medium, clip_2_medium]
 clip_game_level_hard = [clip_1_hard, clip_2_hard]
-#clip_game_level_ultrahard = [clip_1_ultrahard, clip_2_ultrahard]
+clip_game_level_ultrahard = [clip_1_ultrahard, clip_2_ultrahard]
 
 clip_00 = [clip00, clip01, clip02, clip03]
 clip_10 = [clip10, clip11, clip12, clip13]
@@ -133,7 +137,7 @@ def create_objects():
 
 
 streak = 0
-Rexp = 75
+Rexp = 10
 k_x = 1
 k_y = 1 
 i=0
@@ -618,6 +622,10 @@ def start_new_game():
     for e in enemys:
         canv.delete(e['id'])
         enemys = []
+
+    for m in medes:
+        canv.delete(m['id'])
+        medes = []
     
     for bx in boxes:
         canv.delete(bx['id'])
@@ -794,7 +802,8 @@ def music(event):
         clip_game_level_easy[i].stop()
         clip_game_level_medium[i].stop()
         clip_game_level_hard[i].stop()
-        #clip_game_level_ultrahard[i].play()
+        clip_game_level_ultrahard[i].stop()
+        
     r_level = rnd(0,2)
     if level == 1:
         clip_game_level_easy[r_level].play()
@@ -802,8 +811,8 @@ def music(event):
         clip_game_level_medium[r_level].play()
     if level == 3:
         clip_game_level_hard[r_level].play()
-    #if level == 4:
-        #clip_game_level_ultrahard[r_level].play()
+    if level == 4:
+        clip_game_level_ultrahard[r_level].play()
 
 def mute(event):
     global level
@@ -811,7 +820,7 @@ def mute(event):
         clip_game_level_easy[i].stop()
         clip_game_level_medium[i].stop()
         clip_game_level_hard[i].stop()
-        #clip_game_level_ultrahard[i].play()
+        clip_game_level_ultrahard[i].stop()
 
 P1 = Player()
 def new_game(event):
@@ -829,6 +838,11 @@ def new_game(event):
 
 def easy_game(event):
     global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
+    for i in range(0,2):
+        clip_game_level_easy[i].stop()
+        clip_game_level_medium[i].stop()
+        clip_game_level_hard[i].stop()
+        clip_game_level_ultrahard[i].stop()
     mute
     level = 1
     t_med = 20000
@@ -844,7 +858,11 @@ def easy_game(event):
 
 def medium_game(event):
     global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
-    mute
+    for i in range(0,2):
+        clip_game_level_easy[i].stop()
+        clip_game_level_medium[i].stop()
+        clip_game_level_hard[i].stop()
+        clip_game_level_ultrahard[i].stop()
     level = 2
     t_med = 30000
     t_box = 30000
@@ -859,7 +877,11 @@ def medium_game(event):
 
 def hard_game(event):
     global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
-    mute
+    for i in range(0,2):
+        clip_game_level_easy[i].stop()
+        clip_game_level_medium[i].stop()
+        clip_game_level_hard[i].stop()
+        clip_game_level_ultrahard[i].stop()
     level = 3
     t_med = 40000
     t_box = 40000
@@ -874,7 +896,11 @@ def hard_game(event):
 
 def ultrahard_game(event):
     global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
-    mute
+    for i in range(0,2):
+        clip_game_level_easy[i].stop()
+        clip_game_level_medium[i].stop()
+        clip_game_level_hard[i].stop()
+        clip_game_level_ultrahard[i].stop()
     level = 4
     t_med = 50000
     t_box = 50000
@@ -884,7 +910,7 @@ def ultrahard_game(event):
     t0_med = 25000
     t0_box = 30000
     canv.delete(id_level)
-    id_level = canv.create_text(730,590,text = 'Difficulty: Hard',font = '28')
+    id_level = canv.create_text(730,590,text = 'Difficulty: Ultrahard',font = '28')
 
 
 
