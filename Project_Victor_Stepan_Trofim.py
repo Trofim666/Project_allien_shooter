@@ -153,6 +153,14 @@ w = 0.002
 yc = 325
 xc = 400
 
+create_objects()
+
+r_level = 0
+
+i0 = 0
+i0_agressive = 0
+enemys_agressive = []
+
 a_box = 20
 b_box = 40
 
@@ -254,8 +262,6 @@ class Grenade():
             canv.update()
             time.sleep(0.06)
             canv.delete(boom)
-            
-        
 
 
 class Player():
@@ -469,6 +475,7 @@ class Player():
         self.set_coords2()
         self.set_coords3()
 
+P1 = Player()
 
 def get_r_vector(x,y):
     length_vector = sqrt(((x_0 + R)-x)**2 + ((y_0 + R)-y)**2)
@@ -531,9 +538,6 @@ def change_velocity_vy(vx, vy, x, y):
     
     return vy
 
-i0 = 0
-i0_agressive = 0
-enemys_agressive = []
 
 def go_to_player():
     global enemys_agressive
@@ -562,6 +566,7 @@ def new_enemy_agressive():
             enemys_agressive.append(enemy_agressive)
             i0_agressive += 1
     root.after(500,new_enemy_agressive)
+
 
 def new_enemy():
     global i0, i_max
@@ -625,6 +630,7 @@ def new_aptechka():
         med={'id': id_med, 'x': x_box, 'y': y_box}
         medes.append(med)
 
+
 def time_of_medicaments():
     global t0_med, id_med_time2, t_med
     t0_med+=1000
@@ -659,7 +665,6 @@ def time_of_boxes():
         new_box()
 
     root.after(1000,time_of_boxes)
-
 
 
 def start_new_game():    
@@ -709,7 +714,6 @@ def start_new_game():
     P1.set_coords2
     P1.set_coords3
     all_points = 0
-
 
 
 def game_process(event=''):
@@ -929,10 +933,7 @@ def game_process(event=''):
     time.sleep(0.03)
 
     root.after(3, game_process)
-    
-create_objects()
 
-r_level = 0
 
 def music(event):
     global level, r_level
@@ -957,6 +958,7 @@ def music(event):
         clip_game_level_ultrahard[r_level].play()
         r_level += 1
 
+
 def mute(event):
     global level
     for i in range(0,2):
@@ -965,7 +967,7 @@ def mute(event):
         clip_game_level_hard[i].stop()
         clip_game_level_ultrahard[i].stop()
 
-P1 = Player()
+
 def new_game(event):
     global buttom_new_game, trigger
     if trigger==0:
