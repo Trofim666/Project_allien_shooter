@@ -560,7 +560,6 @@ def new_enemy_agressive():
     vy=rnd(-2, 2)
     hp_e = 4
     if i0_agressive < i_max_agressive:
-
         if (x - (x_0 + R))**2 + (y - (y_0 + R))**2 >= a**2 and (x - (x_0 + R))**2 + (y - (y_0 + R))**2 <= (R-40)**2 :
             id_ = canv.create_oval( x - r, y - r, x + r, y + r,fill = 'blue', width=0, activefill = 'purple')
             enemy_agressive={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy, 'hp': hp_e}
@@ -819,7 +818,6 @@ def game_process(event=''):
                     b.vx = 0
                     b.vy = 0
                     b.live=0
-
                     
                     
         if b.live == 1:
@@ -837,10 +835,6 @@ def game_process(event=''):
                 canv.delete(e['id'])
                 canv.delete(g.id)
                 g.blowup()
-                g.x = 0
-                g.y = 0
-                g.vx = 0
-                g.vy = 0
                 streak+=1
                 r_0 = rnd(0,4)
                 r_01 = rnd(0,4)
@@ -868,38 +862,9 @@ def game_process(event=''):
                         all_points +=1
                         i0-=1
                         del enemys[kk]
-                for ee in enemys_agressive:
-                    ee['vx']+= deltav*R*(ee['x'] - g.x)/( (ee['x'] - g.x)**2 + (ee['y'] - g.y)**2 )*0.2
-                    ee['vy']+= deltav*R*(ee['y'] - g.y)/( (ee['x'] - g.x)**2 + (ee['y'] - g.y)**2 )*0.2
-                 
                 for bb in enemys:
                     bb['vx']+= deltav*R*(bb['x'] - g.x)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
                     bb['vy']+= deltav*R*(bb['y'] - g.y)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
-        for k, e in enumerate(enemys_agressive):   
-            if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.r+e['r'])**2 :
-                canv.delete(e['id'])
-                canv.delete(g.id)
-                g.blowup()
-                streak+=1
-                r_0 = rnd(0,4)
-                r_01 = rnd(0,4)
-                all_points+=1
-                for kk, e in enumerate(enemys_agressive):   
-                    if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (Rexp*g.bangtime)**2 :
-                        canv.delete(e['id'])
-                        r_0 = rnd(0,4)
-                        r_01 = rnd(0,4)
-                        all_points +=1
-                        i0-=1
-                        del enemys_agressive[kk]
-                
-                for bb in enemys:
-                    bb['vx']+= deltav*R*(bb['x'] - g.x)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
-                    bb['vy']+= deltav*R*(bb['y'] - g.y)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
-                
-                for ee in enemys_agressive:
-                    ee['vx']+= deltav*R*(ee['x'] - g.x)/( (ee['x'] - g.x)**2 + (ee['y'] - g.y)**2 )*0.2
-                    ee['vy']+= deltav*R*(ee['y'] - g.y)/( (ee['x'] - g.x)**2 + (ee['y'] - g.y)**2 )*0.2
                 g.x = 0
                 g.y = 0
                 g.vx = 0
