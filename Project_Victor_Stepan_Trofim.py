@@ -6,10 +6,10 @@ import time
 import graphics as gr
 import mp3play 
 
-filename_1_easy = r'easy-3.mp3'
+filename_1_easy = r'easy-1.mp3'
 filename_2_easy = r'easy-2.mp3'
-filename_1_medium = r'medium-3.mp3'
-filename_2_medium = r'medium-4.mp3'
+filename_1_medium = r'medium-1.mp3'
+filename_2_medium = r'medium-2.mp3'
 filename_1_hard = r'hard-1.mp3'
 filename_2_hard = r'hard-2.mp3'
 filename_1_ultrahard = r'ultrahard-1.mp3'
@@ -106,7 +106,8 @@ hp = 100
 x_hp = 200
 gren = 5
 bull = 15
-i_max = 8
+i_max = 6
+i_max_agressive = 0
 level = 1
 
 trigger=0
@@ -540,21 +541,22 @@ def go_to_player():
         v = ((e['vx']**2 + e['vy']**2)**0.25)
         sina = (P1.y - e['y'])/sqrt((P1.x-e['x'])**2 + (P1.y - e['y'])**2 )
         cosa = (P1.x - e['x'])/sqrt((P1.x-e['x'])**2 + (P1.y - e['y'])**2 )
-        e['vx'] += 0.2*cosa
-        e['vy'] += 0.2*sina
+        e['vx'] = v*cosa
+        e['vy'] = v*sina
     root.after(20 , go_to_player)
 
 
 def new_enemy_agressive():
-    global i0_agressive, enemys_agressive
+    global i0_agressive, enemys_agressive, i_max_agressive
     i0_agressive = len(enemys_agressive)
     x = rnd(100,700)
     y = rnd(100,500)
     r = rnd(15,20)
-    vx=rnd(-6, 6)
-    vy=rnd(-6, 6)
-    hp_e = 10
-    if i0_agressive < 8:
+    vx=rnd(-2, 2)
+    vy=rnd(-2, 2)
+    hp_e = 4
+    if i0_agressive < i_max_agressive:
+
         if (x - (x_0 + R))**2 + (y - (y_0 + R))**2 >= a**2 and (x - (x_0 + R))**2 + (y - (y_0 + R))**2 <= (R-40)**2 :
             id_ = canv.create_oval( x - r, y - r, x + r, y + r,fill = 'blue', width=0, activefill = 'purple')
             enemy_agressive={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy, 'hp': hp_e}
@@ -752,11 +754,6 @@ def game_process(event=''):
                 canv.delete(e['id'])
                 r_0 = rnd(0,4)
                 r_01 = rnd(0,4)
-                b.x = 0
-                b.y = 0
-                b.vx = 0
-                b.vy = 0
-                b.live=0
                 streak+=1
                 if streak==1:
                     clip_00[r_0].play()
@@ -778,15 +775,47 @@ def game_process(event=''):
                     all_points +=5
                 i0-=1
                 del enemys[k]
+                b.x = 0
+                b.y = 0
+                b.vx = 0
+                b.vy = 0
+                b.live=0
                 
-            for k, e in enumerate(enemys_agressive):
-                if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
-                    all_points +=1
-                    e['hp'] -= 1
-                    if e['hp'] == 0:
-                        canv.delete(e['id'])
-                        i0_agressive -= 1
-                        del enemys_agressive[k]
+        for k, e in enumerate(enemys_agressive):
+            if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
+                all_points +=1
+                e['hp'] -= 1
+                if e['hp'] == 0:
+                    canv.delete(e['id'])
+                    r_0 = rnd(0,4)
+                    r_01 = rnd(0,4)
+                    streak+=1
+                    if streak==1:
+                        clip_00[r_0].play()
+                        all_points +=1
+                    elif streak==2:
+                        clip_r[0].play()
+                        all_points +=2
+                    elif streak==3:
+                        clip_r[1].play()
+                        all_points +=3
+                    elif streak==4:
+                        clip_r[2].play()
+                        all_points +=4
+                    elif streak==5:
+                        clip_r[3].play()
+                        all_points +=5
+                    elif streak>=5:
+                        clip_r5[r_01].play()
+                        all_points +=5
+                    i0_agressive-=1
+                    del enemys_agressive[k]
+                    b.x = 0
+                    b.y = 0
+                    b.vx = 0
+                    b.vy = 0
+                    b.live=0
+
                     
                     
         if b.live == 1:
@@ -832,8 +861,6 @@ def game_process(event=''):
                 for kk, e in enumerate(enemys):   
                     if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (Rexp*g.bangtime)**2 :
                         canv.delete(e['id'])
-                        r_0 = rnd(0,4)
-                        r_01 = rnd(0,4)
                         all_points +=1
                         i0-=1
                         del enemys[kk]
@@ -873,6 +900,50 @@ def game_process(event=''):
                 g.y = 0
                 g.vx = 0
                 g.vy = 0
+
+
+        for k, e in enumerate(enemys_agressive):   
+            if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.r+e['r'])**2 :
+                canv.delete(e['id'])
+                canv.delete(g.id)
+                g.blowup()
+                streak+=1
+                r_0 = rnd(0,4)
+                r_01 = rnd(0,4)
+                if streak==1:
+                    clip_10[r_0].play()
+                    all_points +=1
+                elif streak==2:
+                    clip_r[0].play()
+                    all_points +=2
+                elif streak==3:
+                    clip_r[1].play()
+                    all_points +=3
+                elif streak==4:
+                    clip_r[2].play()
+                    all_points +=4
+                elif streak==5:
+                    clip_r[3].play()
+                    all_points +=5
+                elif streak>=5:
+                    clip_r5[r_01].play()
+                    all_points +=5
+                for kk, e in enumerate(enemys_agressive):   
+                    if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (Rexp*g.bangtime)**2 :
+                        canv.delete(e['id'])
+                        all_points +=1
+                        i0-=1
+                        del enemys_agressive[kk]
+                
+                for bb in enemys:
+                    bb['vx']+= deltav*R*(bb['x'] - g.x)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
+                    bb['vy']+= deltav*R*(bb['y'] - g.y)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
+
+
+                g.x = 0
+                g.y = 0
+                g.vx = 0
+                g.vy = 0
                 g.live = 0
         if g.live == 1:
             streak=0
@@ -896,23 +967,30 @@ def game_process(event=''):
     
 create_objects()
 
+r_level = 0
+
 def music(event):
-    global level
+    global level, r_level
     for i in range(0,2):
         clip_game_level_easy[i].stop()
         clip_game_level_medium[i].stop()
         clip_game_level_hard[i].stop()
         clip_game_level_ultrahard[i].stop()
-        
-    r_level = rnd(0,2)
+    
+    if r_level > 1:
+        r_level = 0
     if level == 1:
         clip_game_level_easy[r_level].play()
+        r_level += 1
     if level == 2:
         clip_game_level_medium[r_level].play()
+        r_level += 1
     if level == 3:
         clip_game_level_hard[r_level].play()
+        r_level += 1
     if level == 4:
         clip_game_level_ultrahard[r_level].play()
+        r_level += 1
 
 def mute(event):
     global level
@@ -939,19 +1017,30 @@ def new_game(event):
 
 
 def easy_game(event):
-    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
+    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level, enemys, enemys_agressive, i_max, i_max_agressive, all_points
     for i in range(0,2):
         clip_game_level_easy[i].stop()
         clip_game_level_medium[i].stop()
         clip_game_level_hard[i].stop()
         clip_game_level_ultrahard[i].stop()
-    mute
+
+    for e in enemys:
+        canv.delete(e['id'])
+        enemys = []
+
+
+    for e in enemys_agressive:
+        canv.delete(e['id'])
+        enemys_agressive = []
+
     level = 1
+    all_points = 0
     t_med = 20000
     t_box = 20000
-    Rexp = 10
+    Rexp = 12
     w = 0.0002
-    i_max = 8
+    i_max_agressive = 0
+    i_max = 6
     t0_med = 0
     t0_box = 14000
     canv.delete(id_level)
@@ -959,18 +1048,26 @@ def easy_game(event):
 
 
 def medium_game(event):
-    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
+    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level, enemys, enemys_agressive, i_max, i_max_agressive, all_points
+
+
     for i in range(0,2):
         clip_game_level_easy[i].stop()
         clip_game_level_medium[i].stop()
         clip_game_level_hard[i].stop()
         clip_game_level_ultrahard[i].stop()
+
+
+    start_new_game()
+
     level = 2
+    all_points = 0
     t_med = 30000
     t_box = 30000
-    Rexp = 8
-    w = 0.002
-    i_max = 10
+    Rexp = 12
+    w = 0.0008
+    i_max_agressive = 1
+    i_max = 8
     t0_med = 20000
     t0_box = 14000
     canv.delete(id_level)
@@ -978,37 +1075,53 @@ def medium_game(event):
 
 
 def hard_game(event):
-    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
+    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level, enemys, enemys_agressive, i_max, i_max_agressive, all_points
+
+
     for i in range(0,2):
         clip_game_level_easy[i].stop()
         clip_game_level_medium[i].stop()
         clip_game_level_hard[i].stop()
         clip_game_level_ultrahard[i].stop()
+
+
+    start_new_game()
+
     level = 3
+    all_points = 0
     t_med = 40000
     t_box = 40000
-    Rexp = 6
-    w = 0.008
-    i_max = 14
+    Rexp = 10
+    w = 0.0012
+    i_max_agressive = 2
+    i_max = 10
     t0_med = 25000
     t0_box = 30000
     canv.delete(id_level)
     id_level = canv.create_text(730,590,text = 'Difficulty: Hard',font = '28')
-    
+
 
 def ultrahard_game(event):
-    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
+    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level, enemys, enemys_agressive, i_max, i_max_agressive, all_points
+
+
     for i in range(0,2):
         clip_game_level_easy[i].stop()
         clip_game_level_medium[i].stop()
         clip_game_level_hard[i].stop()
         clip_game_level_ultrahard[i].stop()
+
+
+    start_new_game()
+
     level = 4
+    all_points = 0
     t_med = 50000
     t_box = 50000
-    Rexp = 4
-    w = 0.015
-    i_max = 16
+    Rexp = 8
+    w = 0.0015
+    i_max_agressive = 4
+    i_max = 8
     t0_med = 25000
     t0_box = 30000
     canv.delete(id_level)
