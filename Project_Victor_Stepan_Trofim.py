@@ -4,112 +4,68 @@ import tkinter as tk
 import math
 import time
 import graphics as gr
-import mp3play 
+import mp3play
 
-filename_1_easy = r'easy-3.mp3'
-filename_2_easy = r'easy-2.mp3'
-filename_1_medium = r'medium-3.mp3'
-filename_2_medium = r'medium-4.mp3'
-filename_1_hard = r'hard-1.mp3'
-filename_2_hard = r'hard-2.mp3'
-filename_1_ultrahard = r'ultrahard-1.mp3'
-filename_2_ultrahard = r'ultrahard-2.mp3'
-
-clip_1_easy = mp3play.load(filename_1_easy)
-clip_2_easy = mp3play.load(filename_2_easy)
-clip_1_medium = mp3play.load(filename_1_medium)
-clip_2_medium = mp3play.load(filename_2_medium)
-clip_1_hard = mp3play.load(filename_1_hard)
-clip_2_hard = mp3play.load(filename_2_hard)
-clip_1_ultrahard = mp3play.load(filename_1_ultrahard)
-clip_2_ultrahard = mp3play.load(filename_2_ultrahard)
-
-filename00 = r'davit.mp3'
-filename01 = r'ud3.mp3'
-filename02 = r'1-kill.mp3'
-filename03 = r'valera.mp3'
-
-filename10 = r'ud3.mp3'
-filename11 = r'na.mp3'
-filename12 = r'1-kill.mp3'
-filename13 = r'za_pushku.mp3'
-
+filename = r'01.mp3'
+filename1 = r'1-kill.mp3'
 filename2 = r'2-kill.mp3'
 filename3 = r'3-kill.mp3'
 filename4 = r'4-kill.mp3'
 filename5 = r'5-kill.mp3'
-filename6 = r'boy.mp3'
-filename7 = r'sasha.mp3'
-filename8 = r'crazy.mp3'
-filename9 = r'hor7.mp3'
+filename6 = r'6-kill.mp3'
+filename_box = r'box.mp3'
+filename_no_bull = r'nobullets.mp3'
+filename_minus_hp = r'minus_hp.mp3'
 
+filename = r'05.mp3'
+filename00 = r'na.mp3'
+filename01 = r'za_pushku.mp3'
+filename02 = r'1-kill.mp3'
+filename03 = r'valera.mp3'
+filename2 = r'2-kill.mp3'
+filename3 = r'3-kill.mp3'
+filename4 = r'4-kill.mp3'
+filename5 = r'5-kill.mp3'
+filename6 = r'6-kill.mp3'
+filename7 = r'7-kill.mp3'
 filename_box = r'box.mp3'
 filename_no_bull = r'nobullets.mp3'
 filename_minus_hp = r'minus_hp.mp3'
 filename_med = r'hill.mp3'
-filename_no_gren = r'no_gren.mp3'
 
+clip = mp3play.load(filename)
 clip00 = mp3play.load(filename00)
 clip01 = mp3play.load(filename01)
 clip02 = mp3play.load(filename02)
 clip03 = mp3play.load(filename03)
-
-clip10 = mp3play.load(filename10)
-clip11 = mp3play.load(filename11)
-clip12 = mp3play.load(filename12)
-clip13 = mp3play.load(filename13)
-
 clip2 = mp3play.load(filename2)
 clip3 = mp3play.load(filename3)
 clip4 = mp3play.load(filename4)
 clip5 = mp3play.load(filename5)
 clip6 = mp3play.load(filename6)
 clip7 = mp3play.load(filename7)
-clip8 = mp3play.load(filename8)
-clip9 = mp3play.load(filename9)
+#clip8 =
 
 
 clip_box = mp3play.load(filename_box)
 clip_no_bull = mp3play.load(filename_no_bull)
-clip_no_gren = mp3play.load(filename_no_gren)
 clip_minus_hp = mp3play.load(filename_minus_hp)
 clip_med = mp3play.load(filename_med)
-clip_no_gren = mp3play.load(filename_no_gren)
 
-clip_game_level_easy = [clip_1_easy, clip_2_easy]
-clip_game_level_medium = [clip_1_medium, clip_2_medium]
-clip_game_level_hard = [clip_1_hard, clip_2_hard]
-clip_game_level_ultrahard = [clip_1_ultrahard, clip_2_ultrahard]
-
-clip_00 = [clip00, clip01, clip02, clip03]
-clip_10 = [clip10, clip11, clip12, clip13]
+clip_r0 = [clip00, clip01, clip02, clip03]
 clip_r = [clip2, clip3, clip4, clip5]
-clip_r5 = [clip6, clip7, clip8, clip9]
-
-
-#load = PIL.Image.open("fon.jpg")
-#render = PIL.ImageTk.PhotoImage(load)
-
-
-#img = Label(self, image=render)
-#img.image = render
-#img.place(x=0, y=0)
+clip_r5 = [clip6, clip7]
 
 root = tk.Tk()
 fr = tk.Frame(root)
 root.geometry('800x650')
 canv = tk.Canvas(root, bg='pink')
 canv.pack(fill=tk.BOTH, expand=1)
-
 all_points = 0
 hp = 100
 x_hp = 200
 gren = 5
 bull = 15
-i_max = 8
-level = 1
-
-trigger=0
 
 t_med = 20000
 t0_med = 0
@@ -119,25 +75,30 @@ t0_box = 14000
 deltav = 10
 boundv = 1
 
-id_level = canv.create_text(730,590,text = 'Difficulty: Easy',font = '28')
-id_points = canv.create_text(30,30,text = 'Score:' + str(all_points),font = '28')
+id_easy = canv.create_rectangle(10, 600, 110, 635, fill='lime', width = 2)
+id_medium = canv.create_rectangle(10, 560, 110, 590, fill='gold', width = 2)
+id_hard = canv.create_rectangle(10, 520, 110, 550, fill='orangered', width = 2)
+id_ultrahard = canv.create_rectangle(10, 480, 110, 510, fill='maroon', width = 2)
+
+
+id_easy_text = canv.create_text(60, 615, text = 'Easy', font = '36')
+id_medium_text = canv.create_text(60, 575, text = 'Medium', font = '36')
+id_hard_text = canv.create_text(60, 535, text = 'Hard', font = '36')
+id_ultrahard_text = canv.create_text(60, 495, text = 'Ultrahard', font = '36')
+
+id_points = canv.create_text(30,30,text = all_points,font = '28')
 id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
 id_hp_percents = canv.create_text(25,90,text = str(hp) + '%',font = '28')
-id_bullets = canv.create_text(730,30,text = 'Bullets:0',font = '28')
-id_grenades = canv.create_text(730,50,text = 'Grenades:0',font = '28')
+id_bullets = canv.create_text(730,30,text = bull,font = '28')
+id_grenades = canv.create_text(730,50,text = gren,font = '28')
 id_med_time1 = canv.create_text(725,90,text = 'Next ammunition:', font = '28')
 id_box_time1 = canv.create_text(725,130,text = 'Next aptechka:',font = '28')
-id_med_time2 = canv.create_text(725,110,text = '00:00',font = '28')
-id_box_time2 = canv.create_text(725,150,text = '00:00',font = '28')
+id_med_time2 = canv.create_text(725,110,text = (t_med//1000),font = '28')
+id_box_time2 = canv.create_text(725,150,text = (t_box//1000),font = '28')
 
-
-def create_objects():
-    canv.create_oval (x_0, y_0, x_0 + 2*R, y_0 + 2*R, outline="gray", fill="red", width=2)
-    canv.create_oval (x_0 + R-a, y_0 + R-a, x_0 + R + a, y_0 + R+a, fill="white", width=2)
-
-
+trigger = 0
 streak = 0
-Rexp = 10
+Rexp = 150
 k_x = 1
 k_y = 1 
 i=0
@@ -148,18 +109,21 @@ R = 300
 a = 200
 M = 1
 dt = 1
-w = 0.002
+w = 0.0002
 yc = 325
 xc = 400
 
 a_box = 20
 b_box = 40
-
 enemys=[]
 grenades=[]
 balls=[]
 boxes = []
 medes = []
+
+def create_objects():
+    canv.create_oval (x_0, y_0, x_0 + 2*R, y_0 + 2*R, outline="gray", fill="red", width=2)
+    canv.create_oval (x_0 + R-a, y_0 + R-a, x_0 + R + a, y_0 + R+a, fill="white", width=2)
 
 
 class Ball():
@@ -240,9 +204,8 @@ class Grenade():
         
     
     def blowup(self):
-        global Rexp
         for i in range(self.bangtime):
-            self.r0+=Rexp
+            self.r0+=10
             boom = canv.create_oval(
                 self.x - self.r0,
                 self.y - self.r0,
@@ -300,20 +263,23 @@ class Player():
 
         
     def check_minus_hp(self):
-        global enemys, hp, x_hp,  id_hp, trigger, screen1
+        global enemys, hp, x_hp,  id_hp, trigger
         
         for e in enemys:
             if (e['x'] - self.x)**2 + (e['y'] - self.y)**2 <= (self.a1 + e['r'])**2:
                 self.live -= 1
                 hp -= 1
                 x_hp -= 2
+                trigger = 1
                 canv.itemconfig(id_hp_percents, text = str(hp) + '%')
                 canv.delete(id_hp)
                 id_hp = canv.create_rectangle(10, 45, x_hp, 75, fill='green', width = 2)
         
-        if self.live <= 0 or (self.x - self.xc)**2 + (self.y - self.yc)**2 >= R**2:
+        if self.live == 0 or (self.x - self.xc)**2 + (self.y - self.yc)**2 >= R**2:
             start_new_game()
-
+            #time.sleep(2)
+            #canv.delete(screen1)
+   
 
     def set_coords2(self):
         canv.coords(
@@ -358,8 +324,7 @@ class Player():
             self.vx+= -boundv*math.cos(self.an)
             self.vy+= -boundv*math.sin(self.an)
             balls += [new_ball]
-        elif bull == 0:
-            clip_no_bull.play()
+
 
     def fire1_start(self, event):
         global grenades, gren
@@ -371,8 +336,7 @@ class Player():
             new_gr.vx = self.f2_power * math.cos(self.an)
             new_gr.vy = - self.f2_power * math.sin(self.an)
             grenades += [new_gr]
-        elif gren == 0:
-            clip_no_gren.play()
+
  
     def targetting(self, event=0):
         global k_x, k_y
@@ -523,19 +487,18 @@ def change_velocity_vy(vx, vy, x, y):
 i0 = 0
 
 def new_enemy():
-    global i0, i_max
+    global i0
     x = rnd(100,700)
     y = rnd(100,500)
     r = rnd(10,15)
     vx=rnd(-6, 6)
     vy=rnd(-6, 6)
-    if i0 < i_max:
+    if i0 < 8:
         if (x - (x_0 + R))**2 + (y - (y_0 + R))**2 >= a**2 and (x - (x_0 + R))**2 + (y - (y_0 + R))**2 <= (R-40)**2 :
             id_ = canv.create_oval( x - r, y - r, x + r, y + r,fill = 'black', width=0)
             enemy={'id': id_, 'x': x, 'y': y, 'r': r, 'vx': vx, 'vy': vy}
             enemys.append(enemy)
             i0+=1
- 
     root.after(200,new_enemy)
 
 
@@ -551,7 +514,6 @@ def motion():
         e['x']+=e['vx']
         e['y']+=e['vy']
         canv.move(e['id'], e['vx'], e['vy'])
-
     root.after(20 , motion)
 
 
@@ -562,6 +524,7 @@ def new_box():
         id_box = canv.create_rectangle(x_box, y_box, x_box + a_box, y_box + b_box, fill='green', width=2)
         box={'id': id_box, 'x': x_box, 'y': y_box}
         boxes.append(box)
+    #root.after(t_box,new_box)
 
 
 def new_aptechka():
@@ -586,7 +549,6 @@ def time_of_medicaments():
         canv.delete(id_med_time2)
         id_med_time2 = canv.create_text(725,150,text = '00:00', font = '32')
         new_aptechka()
-
     root.after(1000,time_of_medicaments)
 
 
@@ -604,16 +566,15 @@ def time_of_boxes():
         canv.delete(id_box_time2)
         id_box_time2 = canv.create_text(725,110,text = '00:00', font = '32')
         new_box()
-
     root.after(1000,time_of_boxes)
 
 
 
 def start_new_game():    
     
-    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents, boxes, medes, bull, gren, i0, t0_med, t0_box, streak
+    global balls, screen1, enemys, all_points, screen1, x_hp, hp, id_hp, id_hp_percents, boxes, medes, bull, gren, i0, t0_med, t0_box
             
-    #screen1 = canv.create_text(400, 300, text='GAME OVER', font = "Times 100 italic bold")
+    screen1 = canv.create_text(400, 300, text='GAME OVER', font = "Times 100 italic bold")
     
     for bb in balls:
         canv.delete(bb.id)
@@ -622,21 +583,19 @@ def start_new_game():
     for e in enemys:
         canv.delete(e['id'])
         enemys = []
-
-    for m in medes:
-        canv.delete(m['id'])
-        medes = []
     
     for bx in boxes:
         canv.delete(bx['id'])
         boxes = []
     
-    streak = 0
-    P1.y = 325
+    for mx in medes:
+        canv.delete(mx['id'])
+        medes = []
+    
     P1.x = 400
+    P1.y = 325
     P1.vx = 0
     P1.vy = 0
-    P1.live = 100
     bull = 15
     gren = 5
     hp = 100
@@ -651,12 +610,14 @@ def start_new_game():
     P1.set_coords1
     P1.set_coords2
     P1.set_coords3
+    P1.live = 100
     all_points = 0
-
+    time.sleep(2)
+    canv.delete(screen1)
 
 
 def game_process(event=''):
-    global balls, all_points, grenades, Rexp, i0, bull, gren, hp, x_hp, id_hp_percents, id_hp, streak, xc, yc, clip_r, clip_box, clip_00, clip_r5, Rexp, clip_10
+    global balls, all_points, grenades, Rexp, i0, bull, gren, hp, x_hp, id_hp_percents, id_hp, streak, xc, yc, clip_r, clip_box, clip_r0, clip_r5, trigger
     root.bind('<Motion>', P1.targetting)
     root.bind('<Right>', P1.move_right)    
     root.bind('<Left>', P1.move_left)
@@ -671,7 +632,6 @@ def game_process(event=''):
                 canv.delete(bx['id'])
                 bull+=5
                 gren+=2
-                clip_box.play()
                 del boxes[k]
                 
     for k, mx in enumerate(medes):
@@ -695,7 +655,7 @@ def game_process(event=''):
             if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
                 canv.delete(e['id'])
                 r_0 = rnd(0,4)
-                r_01 = rnd(0,4)
+                r_01 = rnd(0,2)
                 b.x = 0
                 b.y = 0
                 b.vx = 0
@@ -703,7 +663,7 @@ def game_process(event=''):
                 b.live=0
                 streak+=1
                 if streak==1:
-                    clip_00[r_0].play()
+                    clip_r0[r_0].play()
                     all_points +=1
                 elif streak==2:
                     clip_r[0].play()
@@ -722,11 +682,8 @@ def game_process(event=''):
                     all_points +=5
                 i0-=1
                 del enemys[k]
-        if b.live == 1:
-            streak=0
         if b.live<=0:
             canv.delete(b.id)
-        b.live-=1
     
     
     delete=[]
@@ -737,32 +694,9 @@ def game_process(event=''):
                 canv.delete(e['id'])
                 canv.delete(g.id)
                 g.blowup()
-                streak+=1
-                r_0 = rnd(0,4)
-                r_01 = rnd(0,4)
-                if streak==1:
-                    clip_10[r_0].play()
-                    all_points +=1
-                elif streak==2:
-                    clip_r[0].play()
-                    all_points +=2
-                elif streak==3:
-                    clip_r[1].play()
-                    all_points +=3
-                elif streak==4:
-                    clip_r[2].play()
-                    all_points +=4
-                elif streak==5:
-                    clip_r[3].play()
-                    all_points +=5
-                elif streak>=5:
-                    clip_r5[r_01].play()
-                    all_points +=5
                 for kk, e in enumerate(enemys):   
-                    if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (Rexp*g.bangtime)**2 :
+                    if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= 75**2 :
                         canv.delete(e['id'])
-                        r_0 = rnd(0,4)
-                        r_01 = rnd(0,4)
                         all_points +=1
                         i0-=1
                         del enemys[kk]
@@ -774,8 +708,6 @@ def game_process(event=''):
                 g.vx = 0
                 g.vy = 0
                 g.live = 0
-        if g.live == 1:
-            streak=0
         if g.live<=0:
             canv.delete(g.id)
         else:
@@ -790,156 +722,28 @@ def game_process(event=''):
     P1.acceleration()
     P1.targetting()
     P1.check_minus_hp()
+    #if trigger == 1 and not clip_minus_hp.play():
+        #clip_minus_hp.play()
+        #trigger=0
     time.sleep(0.03)
-
+    
     root.after(3, game_process)
     
 create_objects()
 
-def music(event):
-    global level
-    for i in range(0,2):
-        clip_game_level_easy[i].stop()
-        clip_game_level_medium[i].stop()
-        clip_game_level_hard[i].stop()
-        clip_game_level_ultrahard[i].stop()
-        
-    r_level = rnd(0,2)
-    if level == 1:
-        clip_game_level_easy[r_level].play()
-    if level == 2:
-        clip_game_level_medium[r_level].play()
-    if level == 3:
-        clip_game_level_hard[r_level].play()
-    if level == 4:
-        clip_game_level_ultrahard[r_level].play()
 
-def mute(event):
-    global level
-    for i in range(0,2):
-        clip_game_level_easy[i].stop()
-        clip_game_level_medium[i].stop()
-        clip_game_level_hard[i].stop()
-        clip_game_level_ultrahard[i].stop()
-
+#clip.play() 
+# Let it play for up to 30 seconds, then stop it.
+#import time
+#time.sleep(min(30, clip.seconds()))
+#clip.stop()
+         
 P1 = Player()
-def new_game(event):
-    global buttom_new_game, trigger
-    if trigger==0:
-        buttom_new_game.destroy()
-        trigger = 1
-    if P1.live>0:
-        time_of_medicaments()
-        time_of_boxes()
-        game_process()
-        new_enemy()
-        motion()
+time_of_medicaments()
+time_of_boxes()
+game_process()
+new_enemy()
+motion()
 
-
-def easy_game(event):
-    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
-    for i in range(0,2):
-        clip_game_level_easy[i].stop()
-        clip_game_level_medium[i].stop()
-        clip_game_level_hard[i].stop()
-        clip_game_level_ultrahard[i].stop()
-    mute
-    level = 1
-    t_med = 20000
-    t_box = 20000
-    Rexp = 10
-    w = 0.0002
-    i_max = 8
-    t0_med = 0
-    t0_box = 14000
-    canv.delete(id_level)
-    id_level = canv.create_text(730,590,text = 'Difficulty: Easy',font = '28')
-
-
-def medium_game(event):
-    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
-    for i in range(0,2):
-        clip_game_level_easy[i].stop()
-        clip_game_level_medium[i].stop()
-        clip_game_level_hard[i].stop()
-        clip_game_level_ultrahard[i].stop()
-    level = 2
-    t_med = 30000
-    t_box = 30000
-    Rexp = 8
-    w = 0.002
-    i_max = 10
-    t0_med = 20000
-    t0_box = 14000
-    canv.delete(id_level)
-    id_level = canv.create_text(730,590,text = 'Difficulty: Medium',font = '28')
-
-
-def hard_game(event):
-    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
-    for i in range(0,2):
-        clip_game_level_easy[i].stop()
-        clip_game_level_medium[i].stop()
-        clip_game_level_hard[i].stop()
-        clip_game_level_ultrahard[i].stop()
-    level = 3
-    t_med = 40000
-    t_box = 40000
-    Rexp = 6
-    w = 0.008
-    i_max = 14
-    t0_med = 25000
-    t0_box = 30000
-    canv.delete(id_level)
-    id_level = canv.create_text(730,590,text = 'Difficulty: Hard',font = '28')
-    
-
-def ultrahard_game(event):
-    global id_level, t_med, t_box, Rexp, w, imax, t0_med, t0_box, level
-    for i in range(0,2):
-        clip_game_level_easy[i].stop()
-        clip_game_level_medium[i].stop()
-        clip_game_level_hard[i].stop()
-        clip_game_level_ultrahard[i].stop()
-    level = 4
-    t_med = 50000
-    t_box = 50000
-    Rexp = 4
-    w = 0.015
-    i_max = 16
-    t0_med = 25000
-    t0_box = 30000
-    canv.delete(id_level)
-    id_level = canv.create_text(730,590,text = 'Difficulty: Ultrahard',font = '28')
-
-
-
-buttom_off = tk.Button(root, text = 'Music off',background='yellow',foreground='black', width = 10, height = 1)
-buttom_off.place_configure(x=25, y=150)
-buttom_off.bind("<Button-1>", mute)
-
-buttom_on = tk.Button(root, text = 'Music on',background='yellow',foreground='black', width = 10, height = 1)
-buttom_on.place_configure(x=25, y=120)
-buttom_on.bind("<Button-1>", music)
-
-buttom_new_game = tk.Button(root, text = 'New Game',background='blue',foreground='white', width = 10, height = 1)
-buttom_new_game.place_configure(x=550, y=25)
-buttom_new_game.bind("<Button-1>", new_game)
-
-buttom_easy = tk.Button(root, text = 'Easy',background='lime',foreground='black', width = 10, height = 1)
-buttom_easy.place_configure(x=10, y=600)
-buttom_easy.bind("<Button-1>", easy_game)
-
-buttom_medium = tk.Button(root, text = 'Medium',background='gold',foreground='black', width = 10, height = 1)
-buttom_medium.place_configure(x=10, y=560)
-buttom_medium.bind("<Button-1>", medium_game)
-
-buttom_hard = tk.Button(root, text = 'Hard',background='orangered',foreground='black', width = 10, height = 1)
-buttom_hard.place_configure(x=10, y=520)
-buttom_hard.bind("<Button-1>", hard_game)
-
-buttom_ultrahard = tk.Button(root, text = 'UltraHard',background='maroon',foreground='black', width = 10, height = 1)
-buttom_ultrahard.place_configure(x=10, y=480)
-buttom_ultrahard.bind("<Button-1>", ultrahard_game)
 
 root.mainloop()
