@@ -914,11 +914,11 @@ def ultrahard_game(event):
 
 
 
-buttom_off = tk.Button(root, text = 'Music off',background='yellow',foreground='white', width = 10, height = 1)
+buttom_off = tk.Button(root, text = 'Music off',background='yellow',foreground='black', width = 10, height = 1)
 buttom_off.place_configure(x=25, y=150)
 buttom_off.bind("<Button-1>", mute)
 
-buttom_on = tk.Button(root, text = 'Music on',background='yellow',foreground='white', width = 10, height = 1)
+buttom_on = tk.Button(root, text = 'Music on',background='yellow',foreground='black', width = 10, height = 1)
 buttom_on.place_configure(x=25, y=120)
 buttom_on.bind("<Button-1>", music)
 
