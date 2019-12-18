@@ -1001,6 +1001,7 @@ def mute(event):
         clip_game_level_ultrahard[i].stop()
 
 P1 = Player()
+
 def new_game(event):
     global buttom_new_game, trigger
     if trigger==0:
@@ -1126,7 +1127,6 @@ def ultrahard_game(event):
     t0_box = 30000
     canv.delete(id_level)
     id_level = canv.create_text(730,590,text = 'Difficulty: Ultrahard',font = '28')
-
 
 
 buttom_off = tk.Button(root, text = 'Music off',background='yellow',foreground='black', width = 10, height = 1)
