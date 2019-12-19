@@ -21,9 +21,6 @@ balls=[]
 boxes = []
 medes = []
 
-def pass_event():
-    pass
-
 
 class Ball():
     def __init__(self, canvas, x, y):
@@ -193,6 +190,14 @@ class Player():
 
     def start(self):
         self.bind_all()
+
+
+    def stop(self):
+        self.unbind_all()
+
+
+    def pass_event(self, event):
+        pass
 
 
     def set_coords1(self):
@@ -389,6 +394,19 @@ class Player():
         root.bind('<Button-3>', self.fire_gren_start)
 
 
+    def unbind_all(self):
+        root = self.canvas.get_root()
+
+        root.bind('<Right>', self.pass_event)    
+        root.bind('<Left>', self.pass_event)
+        root.bind('<Up>', self.pass_event)
+        root.bind('<Down>', self.pass_event)
+
+        root.bind('<Motion>', self.pass_event)
+        root.bind('<Button-1>', self.pass_event)
+        root.bind('<Button-3>', self.pass_event)
+
+
 class Enemy():
     def __init__(self, canvas):
         self.x = rnd(100, 700)
@@ -506,6 +524,8 @@ class BattleField(tk.Canvas):
 
         self.k_func = 0
 
+        self.trigger = 0
+
         self.all_points = 0
         self.id_points = self.create_text(30,30,text = 'Score:' + str(self.all_points),font = '28')
 
@@ -520,14 +540,15 @@ class BattleField(tk.Canvas):
 
         self.player = Player(self)
 
+        self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
+
         self.id_hp = self.create_rectangle(10, 45, self.player.x_hp, 75, fill='green', width = 2)
         self.id_hp_percents = self.create_text(25,90,text = str(self.player.hp) + '%',font = '28')
         #self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
 
-    def start(self):
+    def start(self, event):
         global balls, enemys, boxes, medes
-
-        self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
+        self.delete(self.screen1)
 
         for bb in balls:
             self.delete(bb.id)
@@ -545,6 +566,12 @@ class BattleField(tk.Canvas):
             self.delete(bx['id'])
             boxes = []
 
+        self.all_points = 0
+        self.streak = 0
+        self.deltav = 10
+        self.k_func = 0
+        self.trigger = 0
+
         self.player.y = yc
         self.player.x = xc
         self.player.vx = 0
@@ -554,11 +581,6 @@ class BattleField(tk.Canvas):
         self.player.gren = 5
         self.player.hp = 100
         self.player.x_hp = 200
-
-        self.all_points = 0
-        self.streak = 0
-        self.deltav = 10
-        self.k_func = 0
 
         self.player.t0_med = 17
         self.player.t_med = 20
@@ -575,11 +597,7 @@ class BattleField(tk.Canvas):
 
         self.player.start()
         self.enemy = Enemy(self)
-
-        '''for i in range(self.enemy.num_enemys):
-            self.enemy.new_enemy()
-            self.enemy.x = rnd(100, 700)
-            self.enemy.y = rnd(100, 500)'''
+        self.update()
 
 
     def check_minus_hp(self):
@@ -594,7 +612,8 @@ class BattleField(tk.Canvas):
         if self.player.hp <= 0 or (self.player.x - xc)**2 + (self.player.y - yc)**2 >= R**2:
             #self.itemconfig(self.screen1, text='GAME OVER', font = "Times 100 italic bold")
             self.screen1 = self.create_text(400, 300, text='Game Over', font = "Times 100 italic bold")
-
+            self.trigger = 1
+            self.player.stop()
 
 
     def get_root(self):
@@ -603,12 +622,10 @@ class BattleField(tk.Canvas):
             root = root.master
         return root
 
-    def game_over(self):
-        self.screen1 = self.create_text(400, 300, text='Game Over', font = "Times 100 italic bold")
-        self.after(1500, self.start())
-
 
     def update(self):  # put root.after here
+        if self.trigger == 1:
+            return
         for b in balls:
             b.move()
             for k, e in enumerate(enemys):   
@@ -761,13 +778,21 @@ class MainFrame(tk.Frame):
         self.battlefield = BattleField(self)
         self.battlefield.pack(fill=tk.BOTH, expand=1)
 
-        '''self.buttom_new_game = tk.Button(self, text = 'New Game',background='blue',foreground='white', width = 10, height = 1)
+        self.buttom_new_game = tk.Button(self, text = 'New Game',background='blue',foreground='white', width = 10, height = 1)
         self.buttom_new_game.place_configure(x=550, y=25)
-        self.buttom_new_game.bind("<Button-1>", self.start_game)'''
+        self.buttom_new_game.bind("<Button-1>", self.start_game)
 
-    def start_game(self): 
-        self.battlefield.start()
-        self.battlefield.update()
+
+        '''self.buttom_restart = tk.Button(self, text = 'Restart',background='blue',foreground='white', width = 10, height = 1)
+        self.buttom_restart.place_configure(x=570, y=45)
+        self.buttom_restart.bind("<Button-1>", self.restart_game)'''
+
+    def start_game(self, event): 
+        self.battlefield.start(event)
+
+
+    '''def move_objects(self):
+        self.battlefield.update()'''
 
 
 class App(tk.Tk):
@@ -778,9 +803,13 @@ class App(tk.Tk):
         self.main_frame = MainFrame(self.master)
         self.main_frame.pack(fill=tk.BOTH, expand=1)
 
-    def start_game(self):
-        self.main_frame.start_game()
+    def start_game(self, event):
+        self.main_frame.start_game(event)
+        
+    '''def move_objects(self):
+        self.main_frame.move_objects()'''
 
 app = App()
-app.start_game()
+app.start_game("<Button-1>")
+#app.move_objects()
 app.mainloop()
