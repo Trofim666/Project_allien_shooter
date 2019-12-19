@@ -35,8 +35,8 @@ class Ball():
 
         self.r = 3
 
-        self.vx = 10
-        self.vy = 10
+        self.vx = 15
+        self.vy = 15
 
         self.color = choice(['blue', 'green', 'red', 'brown'])
 
@@ -77,7 +77,7 @@ class Grenade():
         self.bangtime = 4
         self.x = x
         self.y = y
-
+        self.Rexp = 4
         self.live = 40
 
         self.vx = 10
@@ -111,15 +111,14 @@ class Grenade():
     
     def blowup(self):
         for i in range(self.bangtime):
-            self.r+=Rexp
-            self.boom = canvas.create_oval(
+            self.r+=self.Rexp
+            self.boom = self.canvas.create_oval(
                 self.x - self.r,
                 self.y - self.r,
                 self.x + self.r,
                 self.y + self.r,
                 fill='orange'
             )
-            self.canvas.update()
             time.sleep(0.06)
             self.canvas.delete(self.boom)
 
@@ -502,9 +501,6 @@ class BattleField(tk.Canvas):
     def __init__(self, master):
         super().__init__(master, background='pink')
 
-        self.num_enemys = 8
-        self.enemys = 0
-
         self.k_func = 0
 
         self.all_points = 0
@@ -556,7 +552,10 @@ class BattleField(tk.Canvas):
         self.player.gren = 5
         self.player.hp = 100
         self.player.x_hp = 200
+
         self.all_points = 0
+        self.streak = 0
+        self.deltav = 10
 
         self.player.t0_med = 17
         self.player.t_med = 20
@@ -608,9 +607,90 @@ class BattleField(tk.Canvas):
     def update(self):  # put root.after here
         for b in balls:
             b.update()
+            for k, e in enumerate(enemys):   
+                if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
+                    self.delete(e['id'])
+                    self.streak+=1
+                    if self.streak==1:
+                        #clip_00[r_0].play()
+                        self.all_points +=1
+                    elif self.streak==2:
+                        #clip_r[0].play()
+                        self.all_points +=2
+                    elif self.streak==3:
+                        #clip_r[1].play()
+                        self.all_points +=3
+                    elif self.streak==4:
+                        #clip_r[2].play()
+                        self.all_points +=4
+                    elif self.streak==5:
+                        #clip_r[3].play()
+                        self.all_points +=5
+                    elif self.streak>=5:
+                        #clip_r5[r_01].play()
+                        self.all_points +=5
+                    self.enemy.enemys-=1
+                    del enemys[k]
+                    b.x = 0
+                    b.y = 0
+                    b.vx = 0
+                    b.vy = 0
+                    b.live=0
+
+            if b.live == 1:
+                self.streak=0
+            if b.live<=0:
+                self.delete(b.id)
+            b.live-=1
+
         for g in grenades:
             g.update()
 
+            for k, e in enumerate(enemys):   
+                if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.r+e['r'])**2 :
+                    self.delete(e['id'])
+                    self.delete(g.id)
+                    g.blowup()
+                    self.streak+=1
+
+                    if self.streak==1:
+                        #clip_10[r_0].play()
+                        self.all_points +=1
+                    elif self.streak==2:
+                        #clip_r[0].play()
+                        self.all_points +=2
+                    elif self.streak==3:
+                        #clip_r[1].play()
+                        self.all_points +=3
+                    elif self.streak==4:
+                        #clip_r[2].play()
+                        self.all_points +=4
+                    elif self.streak==5:
+                        #clip_r[3].play()
+                        self.all_points +=5
+                    elif self.streak>=5:
+                        #clip_r5[r_01].play()
+                        self.all_points +=5
+                    for kk, e in enumerate(enemys):   
+                        if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.Rexp*g.bangtime)**2 :
+                            self.delete(e['id'])
+                            self.all_points +=1
+                            self.enemy.enemys-=1
+                            del enemys[kk]
+                    for bb in enemys:
+                        bb['vx']+= self.deltav*R*(bb['x'] - g.x)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
+                        bb['vy']+= self.deltav*R*(bb['y'] - g.y)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
+                    g.x = 0
+                    g.y = 0
+                    g.vx = 0
+                    g.vy = 0
+
+            if g.live == 1:
+                self.streak=0
+            if g.live<=0:
+                self.delete(g.id)
+            else:
+                g.live+= -1
 
         self.itemconfig(self.id_bullets, text='Bullets:'+str(self.player.bull))
         self.itemconfig(self.id_grenades, text='Grenades:'+str(self.player.gren))    
