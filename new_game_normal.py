@@ -545,7 +545,9 @@ class BattleField(tk.Canvas):
         self.id_hp = self.create_rectangle(10, 45, self.player.x_hp, 75, fill='green', width = 2)
         self.id_hp_percents = self.create_text(25,90,text = str(self.player.hp) + '%',font = '28')
         #self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
-
+        
+        
+        
     def start(self, event):
         global balls, enemys, boxes, medes
         self.delete(self.screen1)
@@ -623,7 +625,7 @@ class BattleField(tk.Canvas):
         return root
 
 
-    def update(self):  # put root.after here
+    def update(self):
         if self.trigger == 1:
             return
         for b in balls:
@@ -782,17 +784,49 @@ class MainFrame(tk.Frame):
         self.buttom_new_game.place_configure(x=550, y=25)
         self.buttom_new_game.bind("<Button-1>", self.start_game)
 
+        self.buttom_restart = tk.Button(self, text = 'Restart',background='blue',foreground='white', width = 10, height = 1)
+        self.buttom_restart.place_configure(x=580, y=55)
+        self.buttom_restart.bind("<Button-1>", self.restart)
+      
+             
+        self.buttom_easy = tk.Button(self, text = 'Easy', background='lime', foreground='black', width = 10, height = 1)
+        self.buttom_easy.place_configure(x=10, y=600)
+        self.buttom_easy.bind("<Button-1>", self.easy_game)        
 
-        '''self.buttom_restart = tk.Button(self, text = 'Restart',background='blue',foreground='white', width = 10, height = 1)
-        self.buttom_restart.place_configure(x=570, y=45)
-        self.buttom_restart.bind("<Button-1>", self.restart_game)'''
+        self.buttom_medium = tk.Button(self, text = 'Medium',background='gold',foreground='black', width = 10, height = 1)
+        self.buttom_medium.place_configure(x=10, y=560)
+        self.buttom_medium.bind("<Button-1>", self.medium_game)
+                
+        self.buttom_hard = tk.Button(self, text = 'Hard',background='orangered',foreground='black', width = 10, height = 1)
+        self.buttom_hard.place_configure(x=10, y=520)
+        self.buttom_hard.bind("<Button-1>", self.hard_game)
 
+        self.buttom_ultrahard = tk.Button(self, text = 'UltraHard',background='maroon',foreground='black', width = 10, height = 1)
+        self.buttom_ultrahard.place_configure(x=10, y=480)
+        self.buttom_ultrahard.bind("<Button-1>", self.ultrahard_game)
+     
+        
+    def ultrahard_game(self, event):
+        self.battlefield.ultrahard_game(event) 
+        
+    def hard_game(self, event):
+        self.battlefield.hard_game(event)
+    
+    def medium_game(self, event):
+        self.battlefield.medium_game(event)
+          
+    def easy_game(self, event):
+        self.battlefield.easy_game(event)
+    
+    
+    def restart(self, event):
+        self.battlefield.trigger == 1
+        time.sleep(0.3)
+        self.battlefield.start(event)
+        
     def start_game(self, event): 
         self.battlefield.start(event)
 
-
-    '''def move_objects(self):
-        self.battlefield.update()'''
 
 
 class App(tk.Tk):
@@ -804,12 +838,15 @@ class App(tk.Tk):
         self.main_frame.pack(fill=tk.BOTH, expand=1)
 
     def start_game(self, event):
-        self.main_frame.start_game(event)
+        if self.main_frame.battlefield.trigger == 1:
+            self.main_frame.start_game(event)
+        else: 
+            self.main_frame.restart(event)
         
-    '''def move_objects(self):
-        self.main_frame.move_objects()'''
+    ''' кнопка   RESTART пока не работает нормально: все равно ускоряет игру, 
+      что странно, так как вроде бы trigger прирпавнивается единице при 
+                 вызове функции restart  '''
 
 app = App()
 app.start_game("<Button-1>")
-#app.move_objects()
 app.mainloop()
