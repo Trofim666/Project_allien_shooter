@@ -686,6 +686,35 @@ class BattleField(tk.Canvas):
                     b.vx = 0
                     b.vy = 0
                     b.live=0
+            for k, e in enumerate(enemys2):   
+                if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
+                    self.delete(e['id'])
+                    self.streak+=1
+                    if self.streak==1:
+                        #clip_00[r_0].play()
+                        self.all_points +=1
+                    elif self.streak==2:
+                        #clip_r[0].play()
+                        self.all_points +=2
+                    elif self.streak==3:
+                        #clip_r[1].play()
+                        self.all_points +=3
+                    elif self.streak==4:
+                        #clip_r[2].play()
+                        self.all_points +=4
+                    elif self.streak==5:
+                        #clip_r[3].play()
+                        self.all_points +=5
+                    elif self.streak>=5:
+                        #clip_r5[r_01].play()
+                        self.all_points +=5
+                    self.enemy.enemys2-=1
+                    del enemys2[k]
+                    b.x = 0
+                    b.y = 0
+                    b.vx = 0
+                    b.vy = 0
+                    b.live=0
 
             if b.live == 1:
                 self.streak=0
@@ -725,12 +754,20 @@ class BattleField(tk.Canvas):
                     for kk, e in enumerate(enemys):   
                         if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.Rexp*g.bangtime)**2 :
                             self.delete(e['id'])
+                            g.blowup()
                             self.all_points +=1
                             self.enemy.enemys-=1
                             del enemys[kk]
+                    for kk, e in enumerate(enemys2):   
+                        if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.Rexp*g.bangtime)**2 :
+                            self.delete(e['id'])
+                            g.blowup()
+                            self.all_points +=1
+                            self.enemy.enemys2-=1
+                            del enemys2[kk]
                     for bb in enemys:
-                        bb['vx']+= self.deltav*R*(bb['x'] - g.x)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
-                        bb['vy']+= self.deltav*R*(bb['y'] - g.y)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
+                        bb['vx']+= self.deltav*R*(bb['x'] - g.x)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.02
+                        bb['vy']+= self.deltav*R*(bb['y'] - g.y)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.02
                     g.x = 0
                     g.y = 0
                     g.vx = 0
