@@ -3,7 +3,6 @@ from random import randrange as rnd, choice
 import tkinter as tk
 import math
 import time
-#import graphics as gr
 
 
 WINDOW_SIZE = (800, 650)
@@ -60,13 +59,10 @@ class Ball():
                 self.y + self.r
         )
 
-    def update(self):
+    def move(self):
         self.x += self.vx
         self.y -= self.vy
         self.set_coords()
-
-    def destroy_bullets(self):
-        self.canvas.delete(self.id)
 
 
 class Grenade():
@@ -103,7 +99,7 @@ class Grenade():
                 self.y + self.r
         )
 
-    def update(self):
+    def move(self):
         self.x += self.vx
         self.y -= self.vy
         self.set_coords()
@@ -121,9 +117,6 @@ class Grenade():
             )
             time.sleep(0.06)
             self.canvas.delete(self.boom)
-
-    def destroy_grenades(self):
-        self.canvas.delete(self.id)
 
 
 class Player():
@@ -396,7 +389,6 @@ class Player():
         root.bind('<Button-3>', self.fire_gren_start)
 
 
-
 class Enemy():
     def __init__(self, canvas):
         self.x = rnd(100, 700)
@@ -412,66 +404,77 @@ class Enemy():
         self.canvas = canvas
 
 
-    '''def get_r_vector(self, x, y):
-        self.length_vector = sqrt((xc-self.x)**2 + (yc-self.y)**2)
-        self.radius_vector = Point((xc-x) / self.length_vector, (yc-y) / self.length_vector)
-        return self.radius_vector
-
-
-    def get_normal(self, x, y):
+    def get_r_vector_x(self, x, y):
         self.length_vector = sqrt((xc-x)**2 + (yc-y)**2)
-        self.normal_vector = Point((yc-y) / self.length_vector, -(xc-x) / self.length_vector)
-        return self.normal_vector
+        self.radius_vector_x = (xc-x) / self.length_vector
+        return self.radius_vector_x
 
 
-    def scalar_multiplication(self, vector_1, vector_2):
-        self.scalar = vector_1.x*vector_2.x + vector_1.y*vector_2.y
+    def get_r_vector_y(self, x, y):
+        self.length_vector = sqrt((xc-x)**2 + (yc-y)**2)
+        self.radius_vector_y = (yc-y) / self.length_vector
+        return self.radius_vector_y
+
+
+    def get_normal_x(self, x, y):
+        self.length_vector = sqrt((xc-x)**2 + (yc-y)**2)
+        self.normal_vector_x = (yc-y) / self.length_vector
+        return self.normal_vector_x
+
+
+    def get_normal_y(self, x, y):
+        self.length_vector = sqrt((xc-x)**2 + (yc-y)**2)
+        self.normal_vector_y = -(xc-x) / self.length_vector
+        return self.normal_vector_y
+
+
+    def scalar_multiplication(self, vector_1_x, vector_1_y, vector_2_x, vector_2_y):
+        self.scalar = vector_1_x*vector_2_x + vector_1_y*vector_2_y
         return self.scalar
 
 
     def change_velocity_vx(self, vx, vy, x, y):
-        self.velocity=Point(self.vx, self.vy)
-        self.vel_normal_0 = Point(self.get_r_vector(self.x,self.y).x 
-                                * self.scalar_multiplication(self.get_r_vector(self.x,self.y),self.velocity), 
-                                self.get_r_vector(self.x,self.y).y 
-                                * self.scalar_multiplication(self.get_r_vector(self.x,self.y),self.velocity)
-        )
-        self.vel_tau = Point(self.get_normal(self.x,self.y).x 
-                           * self.scalar_multiplication(self.get_normal(self.x,self.y),self.velocity), 
-                           self.get_normal(self.x,self.y).y 
-                           * self.scalar_multiplication(self.get_normal(self.x,self.y),self.velocity)
-        )
-        self.vel_normal_1 = Point(-self.vel_normal_0.x,-self.vel_normal_0.y)
-        self.i = Point(1, 0)
+        self.vel_normal_0_x = self.get_r_vector_x(x,y)*self.scalar_multiplication(self.get_r_vector_x(x,y), self.get_r_vector_y(x,y),vx, vy)
 
-        self.vel_1_x = self.scalar_multiplication(self.vel_normal_1, self.i)
-        self.vel_2_x = self.scalar_multiplication(self.vel_tau, self.i)
+        self.vel_normal_0_y = self.get_r_vector_y(x,y)* self.scalar_multiplication(self.get_r_vector_x(x,y), self.get_r_vector_y(x,y),vx, vy)
+
+
+        self.vel_tau_x = self.get_normal_x(x,y)* self.scalar_multiplication(self.get_normal_x(x,y), self.get_normal_y(x,y),vx, vy)
+
+        self.vel_tau_y = self.get_normal_y(x,y)* self.scalar_multiplication(self.get_normal_x(x,y), self.get_normal_y(x,y),vx, vy)
+
+
+        self.i_x = 1
+        self.i_y = 0
+
+        self.vel_1_x = self.scalar_multiplication(-self.vel_normal_0_x, -self.vel_normal_0_y, self.i_x, self.i_y)
+        self.vel_2_x = self.scalar_multiplication(self.vel_tau_x, self.vel_tau_y, self.i_x, self.i_y)
         self.vx = self.vel_1_x + self.vel_2_x
         
         return self.vx
 
 
     def change_velocity_vy(self, vx, vy, x, y):
-        self.velocity=Point(self.vx, self.vy)
-        self.vel_normal_0 = Point(self.get_r_vector(self.x,self.y).x 
-                                * self.scalar_multiplication(self.get_r_vector(self.x,self.y),self.velocity), 
-                                self.get_r_vector(self.x,self.y).y 
-                                * self.scalar_multiplication(self.get_r_vector(self.x,self.y),self.velocity)
-        )
-        self.vel_tau = Point(self.get_normal(x,y).x 
-                           * self.scalar_multiplication(self.get_normal(self.x,self.y),self.velocity), 
-                           self.get_normal(self.x,self.y).y 
-                           * self.scalar_multiplication(self.get_normal(self.x,self.y),self.velocity)
-        )
-        self.vel_normal_1 = Point(-self.vel_normal_0.x,-self.vel_normal_0.y)
-        self.j = Point(0, 1)
+
+        self.vel_normal_0_x = self.get_r_vector_x(x,y)*self.scalar_multiplication(self.get_r_vector_x(x,y), self.get_r_vector_y(x,y),vx, vy)
+
+        self.vel_normal_0_y = self.get_r_vector_y(x,y)* self.scalar_multiplication(self.get_r_vector_x(x,y), self.get_r_vector_y(x,y),vx, vy)
+
+
+        self.vel_tau_x = self.get_normal_x(x,y)* self.scalar_multiplication(self.get_normal_x(x,y), self.get_normal_y(x,y),vx, vy)
+
+        self.vel_tau_y = self.get_normal_y(x,y)* self.scalar_multiplication(self.get_normal_x(x,y), self.get_normal_y(x,y),vx, vy)
+
+
+        self.j_x = 0
+        self.j_y = 1
         
-        self.vel_1_y = self.scalar_multiplication(self.vel_normal_1, self.j)
-        self.vel_2_y = self.scalar_multiplication(self.vel_tau, self.j)
+        self.vel_1_y = self.scalar_multiplication(-self.vel_normal_0_x, -self.vel_normal_0_y, self.j_x, self.j_y)
+        self.vel_2_y = self.scalar_multiplication(self.vel_tau_x, self.vel_tau_y, self.j_x, self.j_y)
         
         self.vy = self.vel_1_y + self.vel_2_y
         
-        return self.vy'''
+        return self.vy
 
 
     def new_enemy(self):
@@ -488,10 +491,10 @@ class Enemy():
             e['vx']+= ( -2*w*e['vy'] + (w**2)*(-xc + e['x'])  )*dt
             e['vy']+= ( +2*w*e['vx'] + (w**2)*(-yc + e['y'])  )*dt
             if (xc - e['x'])**2 + (yc - e['y'])**2 >= (R-e['r'])**2:
-                #v_x = self.change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
-                #v_y = self.change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
-                e['vx'] = -e['vx']
-                e['vy'] = -e['vy']
+                v_x = self.change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
+                v_y = self.change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
+                e['vx'] = v_x
+                e['vy'] = v_y
             e['x']+=e['vx']
             e['y']+=e['vy']
             self.canvas.move(e['id'], e['vx'], e['vy'])
@@ -516,14 +519,13 @@ class BattleField(tk.Canvas):
         self.out1 = self.create_oval (xc - a, yc - a, xc + a, yc + a, fill="white", width=2)
 
         self.player = Player(self)
-        self.enemy = Enemy(self)
 
         self.id_hp = self.create_rectangle(10, 45, self.player.x_hp, 75, fill='green', width = 2)
         self.id_hp_percents = self.create_text(25,90,text = str(self.player.hp) + '%',font = '28')
-        self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
+        #self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
 
     def start(self):
-        global balls, screen1, enemys, boxes, medes
+        global balls, enemys, boxes, medes
 
         self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
 
@@ -556,6 +558,7 @@ class BattleField(tk.Canvas):
         self.all_points = 0
         self.streak = 0
         self.deltav = 10
+        self.k_func = 0
 
         self.player.t0_med = 17
         self.player.t_med = 20
@@ -571,11 +574,12 @@ class BattleField(tk.Canvas):
         self.id_hp_percents = self.create_text(25,90,text = str(self.player.hp) + '%' ,font = '28')
 
         self.player.start()
+        self.enemy = Enemy(self)
 
-        if self.k_func % 200 == 0:
+        '''for i in range(self.enemy.num_enemys):
             self.enemy.new_enemy()
             self.enemy.x = rnd(100, 700)
-            self.enemy.y = rnd(100, 500)
+            self.enemy.y = rnd(100, 500)'''
 
 
     def check_minus_hp(self):
@@ -588,10 +592,9 @@ class BattleField(tk.Canvas):
                 self.delete(self.id_hp)
                 self.id_hp = self.create_rectangle(10, 45, self.player.x_hp, 75, fill='green', width = 2)
         if self.player.hp <= 0 or (self.player.x - xc)**2 + (self.player.y - yc)**2 >= R**2:
-            self.itemconfig(self.screen1, text='GAME OVER', font = "Times 100 italic bold")
-            #time.sleep(2)
-            #self.delete(self.screen1)
-            self.start()
+            #self.itemconfig(self.screen1, text='GAME OVER', font = "Times 100 italic bold")
+            self.screen1 = self.create_text(400, 300, text='Game Over', font = "Times 100 italic bold")
+
 
 
     def get_root(self):
@@ -600,13 +603,14 @@ class BattleField(tk.Canvas):
             root = root.master
         return root
 
-    def game_over():
-        self.itemconfig(self.screen1, text='GAME OVER', font = "Times 100 italic bold")
-        self.after(2000, self.restart)
+    def game_over(self):
+        self.screen1 = self.create_text(400, 300, text='Game Over', font = "Times 100 italic bold")
+        self.after(1500, self.start())
+
 
     def update(self):  # put root.after here
         for b in balls:
-            b.update()
+            b.move()
             for k, e in enumerate(enemys):   
                 if (b.x-e['x'])**2 + (b.y-e['y'])**2 <= (b.r + e['r'])**2:
                     self.delete(e['id'])
@@ -644,13 +648,15 @@ class BattleField(tk.Canvas):
             b.live-=1
 
         for g in grenades:
-            g.update()
+            g.move()
 
             for k, e in enumerate(enemys):   
                 if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.r+e['r'])**2 :
                     self.delete(e['id'])
                     self.delete(g.id)
-                    g.blowup()
+                    if self.k_func % 60 == 0:
+                        g.blowup()
+                        self.delete(g.boom)
                     self.streak+=1
 
                     if self.streak==1:
@@ -698,8 +704,10 @@ class BattleField(tk.Canvas):
 
         if self.k_func % 200 == 0:
             self.enemy.new_enemy()
+
             self.enemy.x = rnd(100, 700)
             self.enemy.y = rnd(100, 500)
+            self.enemy.r = rnd(10, 15)
 
         self.enemy.motion()
         self.enemy.vx = rnd(-6, 6)
@@ -748,12 +756,16 @@ class BattleField(tk.Canvas):
 
 class MainFrame(tk.Frame):
     def __init__(self, master):
-        super().__init__()
+        super().__init__(master)
 
         self.battlefield = BattleField(self)
         self.battlefield.pack(fill=tk.BOTH, expand=1)
 
-    def start_game(self):
+        '''self.buttom_new_game = tk.Button(self, text = 'New Game',background='blue',foreground='white', width = 10, height = 1)
+        self.buttom_new_game.place_configure(x=550, y=25)
+        self.buttom_new_game.bind("<Button-1>", self.start_game)'''
+
+    def start_game(self): 
         self.battlefield.start()
         self.battlefield.update()
 
