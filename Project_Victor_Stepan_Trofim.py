@@ -671,8 +671,8 @@ def motion():
         canv.move(e['id'], e['vx'], e['vy'])
     
     for e in enemys_agressive:
-        e['vx']+= ( -2*w*e['vy'] + (w**2)*(-x_0 - R + e['x'])  )*dt
-        e['vy']+= ( +2*w*e['vx'] + (w**2)*(-y_0 - R + e['y'])  )*dt
+        #e['vx']+= ( -2*w*e['vy'] + (w**2)*(-x_0 - R + e['x'])  )*dt
+        #e['vy']+= ( +2*w*e['vx'] + (w**2)*(-y_0 - R + e['y'])  )*dt
         if (x_0 + R - e['x'])**2 + (y_0 + R - e['y'])**2 >= (R-e['r'])**2:
             vx = change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
             vy = change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])

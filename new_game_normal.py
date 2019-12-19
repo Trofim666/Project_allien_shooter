@@ -16,6 +16,7 @@ R = 300
 
 
 enemys=[]
+enemys2 = []
 grenades=[]
 balls=[]
 boxes = []
@@ -73,7 +74,7 @@ class Grenade():
         self.bangtime = 4
         self.x = x
         self.y = y
-        self.Rexp = 4
+        self.Rexp = 3
         self.live = 40
 
         self.vx = 10
@@ -115,8 +116,10 @@ class Grenade():
                 self.y + self.r,
                 fill='orange'
             )
-            time.sleep(0.06)
+            
+            time.sleep(0.006)
             self.canvas.delete(self.boom)
+            self.canvas.update()
 
 
 class Player():
@@ -391,15 +394,31 @@ class Player():
 
 class Enemy():
     def __init__(self, canvas):
+        
+        
+        
         self.x = rnd(100, 700)
         self.y = rnd(100, 500)
         self.r = rnd(10, 15)
+        
+        self.x2 = rnd(100, 700)
+        self.y2 = rnd(100, 500)
+        self.r2 = rnd(10, 15)
 
+        self.vx2 = rnd(-1, 1)
+        self.vy2 = rnd(-1, 1)
+        
+        
         self.vx = rnd(-6, 6)
         self.vy = rnd(-6, 6)
 
         self.num_enemys = 8
+        
+        self.num_enemys2 = 3
+        
         self.enemys = 0
+        
+        self.enemys2 = 0
 
         self.canvas = canvas
 
@@ -483,10 +502,16 @@ class Enemy():
                 self.enemy={'id': self.id_, 'x': self.x, 'y': self.y, 'r': self.r, 'vx': self.vx, 'vy': self.vy}
                 self.enemys+=1
                 enemys.append(self.enemy)
+                
+    def new_enemy2(self):
+            if (self.x2 - xc)**2 + (self.y2 - yc)**2 >= a**2 and (self.x2 - xc)**2 + (self.y2 - yc)**2 <= (R-40)**2 and self.enemys2 < self.num_enemys2:
+                self.id2 = self.canvas.create_oval(self.x2 - self.r2, self.y2 - self.r2, self.x2 + self.r2, self.y2 + self.r2,fill = 'blue', width=0, activefill = 'green')
+                self.enemy2={'id': self.id2, 'x': self.x2, 'y': self.y2, 'r': self.r2, 'vx': self.vx2, 'vy': self.vy2}
+                self.enemys2+=1
+                enemys2.append(self.enemy2)
 
 
     def motion(self):
-        global enemys
         for e in enemys:
             e['vx']+= ( -2*w*e['vy'] + (w**2)*(-xc + e['x'])  )*dt
             e['vy']+= ( +2*w*e['vx'] + (w**2)*(-yc + e['y'])  )*dt
@@ -495,6 +520,17 @@ class Enemy():
                 v_y = self.change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
                 e['vx'] = v_x
                 e['vy'] = v_y
+            e['x']+=e['vx']
+            e['y']+=e['vy']
+            self.canvas.move(e['id'], e['vx'], e['vy'])
+    
+    def motion2(self, P):
+        for e in enemys2:
+            v = sqrt(e['vx']**2 + e['vy']**2)
+            sina = (P.y - e['y'])/sqrt((P.x-e['x'])**2 + (P.y - e['y'])**2 )
+            cosa = (P.x - e['x'])/sqrt((P.x-e['x'])**2 + (P.y - e['y'])**2 )
+            e['vx'] = v*cosa
+            e['vy'] = v*sina
             e['x']+=e['vx']
             e['y']+=e['vy']
             self.canvas.move(e['id'], e['vx'], e['vy'])
@@ -591,6 +627,16 @@ class BattleField(tk.Canvas):
                 self.itemconfig(self.id_hp_percents, text = str(self.player.hp) + '%')
                 self.delete(self.id_hp)
                 self.id_hp = self.create_rectangle(10, 45, self.player.x_hp, 75, fill='green', width = 2)
+                
+        for e in enemys2:
+            if (e['x'] - self.player.x)**2 + (e['y'] - self.player.y)**2 <= (self.player.R1 + e['r'])**2:
+                self.player.hp -= 1
+                self.player.x_hp -= 2
+                self.itemconfig(self.id_hp_percents, text = str(self.player.hp) + '%')
+                self.delete(self.id_hp)
+                self.id_hp = self.create_rectangle(10, 45, self.player.x_hp, 75, fill='green', width = 2) 
+                
+                
         if self.player.hp <= 0 or (self.player.x - xc)**2 + (self.player.y - yc)**2 >= R**2:
             #self.itemconfig(self.screen1, text='GAME OVER', font = "Times 100 italic bold")
             self.screen1 = self.create_text(400, 300, text='Game Over', font = "Times 100 italic bold")
@@ -652,11 +698,10 @@ class BattleField(tk.Canvas):
 
             for k, e in enumerate(enemys):   
                 if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.r+e['r'])**2 :
+                    g.blowup()
                     self.delete(e['id'])
                     self.delete(g.id)
-                    if self.k_func % 60 == 0:
-                        g.blowup()
-                        self.delete(g.boom)
+                    
                     self.streak+=1
 
                     if self.streak==1:
@@ -704,14 +749,23 @@ class BattleField(tk.Canvas):
 
         if self.k_func % 200 == 0:
             self.enemy.new_enemy()
-
             self.enemy.x = rnd(100, 700)
             self.enemy.y = rnd(100, 500)
             self.enemy.r = rnd(10, 15)
-
+        if self.k_func % 200 == 0:
+            self.enemy.new_enemy2()
+            self.enemy.x2 = rnd(100, 700)
+            self.enemy.y2 = rnd(100, 500)
+            self.enemy.r2 = rnd(10, 15)
+        
         self.enemy.motion()
-        self.enemy.vx = rnd(-6, 6)
-        self.enemy.vy = rnd(-6, 6)
+        self.enemy.motion2(self.player)
+        
+        self.enemy.vx = rnd(-2, 2)
+        self.enemy.vy = rnd(-2, 2)
+        
+        self.enemy.vx2 = rnd(-1, 1)
+        self.enemy.vy2 = rnd(-1, 1)
 
         self.player.move()
         self.player.acceleration()
