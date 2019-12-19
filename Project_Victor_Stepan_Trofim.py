@@ -171,6 +171,51 @@ boxes = []
 medes = []
 
 
+class Game():
+    
+    def __init__(self):
+    
+        self.all_points = 0
+        self.hp = 100
+        self.x_hp = 200
+        self.gren = 5
+        self.bull = 15
+        self.i_max = 6
+        self.i_max_agressive = 0
+        self.level = 1
+        self.i0 = 0
+        self.i0_agressive = 0
+        
+        
+        self.trigger=0
+        
+        self.t_med = 20000
+        self.t0_med = 0
+        self.t_box = 20000
+        self.t0_box = 14000
+        
+        self.deltav = 10
+        self.boundv = 0.1
+        
+        self.streak = 0
+    
+        self.k_x = 1
+        self.k_y = 1
+        self.i=0
+        self.k=0
+        self.x_0 = 100
+        self.y_0 = 25
+        self.R = 300
+        self.a = 200
+        self.M = 1
+        self.dt = 1
+        self.w = 0.002
+        self.yc = 325
+        self.xc = 400
+        self.a_box = 20
+        self.b_box = 40
+
+
 class Ball():
     
     def __init__(self, x=400, y=325):
@@ -265,8 +310,8 @@ class Grenade():
 
 
 class Player():
-    
     def __init__(self, ):
+        self.game = Game()
         self.f2_power = 20
         self.x = 400
         self.y = 325
@@ -370,8 +415,8 @@ class Player():
             new_ball.r += 5
             bull-=1
             self.an = math.atan2((event.y-new_ball.y) , (event.x-new_ball.x))
-            new_ball.vx = self.f2_power * math.cos(self.an)
-            new_ball.vy = - self.f2_power * math.sin(self.an)
+            new_ball.vx = new_ball.vx * math.cos(self.an)
+            new_ball.vy = - new_ball.vy * math.sin(self.an)
             self.vx+= -boundv*math.cos(self.an)
             self.vy+= -boundv*math.sin(self.an)
             balls += [new_ball]
@@ -412,8 +457,8 @@ class Player():
         #cosa =(self.x-self.xc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2  ) 
         #self.ax = self.F*k_x/self.m + k_x * 2*w*self.vy + w**2*(self.x-self.xc)
         #self.ay = self.F*k_y/self.m + k_y * 2*w*self.vx + w**2*(self.y-self.yc)
-        self.ax =  -2*w*self.vy + (w**2)*(self.x-self.xc)
-        self.ay =  2*w*self.vx +(w**2)*(self.y-self.yc)
+        self.ax =  -2*w*self.vy + (w**2)*(self.x-xc)
+        self.ay =  2*w*self.vx +(w**2)*(self.y-yc)
         self.vx +=self.ax*dt 
         self.vy +=self.ay*dt
         self.v = math.sqrt(self.vx**2 + self.vy**2)
@@ -474,6 +519,33 @@ class Player():
         self.set_coords1()
         self.set_coords2()
         self.set_coords3()
+        
+        
+    def new_aptechka(self):
+        self.x_box = rnd(260,540)
+        self.y_box = rnd(185,465)
+        if (self.x_box - xc)**2 + (y_box - yc)**2 <= a**2:
+            id_med = canv.create_rectangle(x_box, y_box, x_box + a_box, y_box + b_box, fill='aqua', width=2)
+            med={'id': id_med, 'x': x_box, 'y': y_box}
+            medes.append(med)
+
+
+    def time_of_medicaments():
+        global t0_med, id_med_time2, t_med
+        t0_med+=1000
+        if t_med - t0_med >= 10000:
+            canv.delete(id_med_time2)
+            id_med_time2 = canv.create_text(725,150,text = '00:' + str((t_med-t0_med)//1000), font = '32')
+        elif t_med - t0_med > 0:
+            canv.delete(id_med_time2)
+            id_med_time2 = canv.create_text(725,150,text = '00:0' + str((t_med-t0_med)//1000), font = '32')
+        elif t_med - t0_med == 0:
+            t0_med = 0
+            canv.delete(id_med_time2)
+            id_med_time2 = canv.create_text(725,150,text = '00:00', font = '32')
+            new_aptechka()
+
+        root.after(1000,time_of_medicaments)
 
 P1 = Player()
 
@@ -973,7 +1045,7 @@ def new_game(event):
     if trigger==0:
         buttom_new_game.destroy()
         trigger = 1
-    if P1.live>0:
+    while P1.live>0:
         time_of_medicaments()
         time_of_boxes()
         game_process()
