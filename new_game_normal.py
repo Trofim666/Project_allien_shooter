@@ -119,10 +119,14 @@ class Grenade():
 class Player():
     def __init__(self, canvas):
 
-        #self.game = Game()
-
         self.canvas = canvas
-
+        
+        self.id_level = self.canvas.create_text(730,590,text = 'Difficulty: Default',font = '28')
+        self.level = None
+        self.Rexp = None
+        self.w = None
+        self.i_max = 8
+        
         self.boundv = 0.1
 
         self.x = xc
@@ -186,6 +190,56 @@ class Player():
                 self.y + self.R2,
                 fill='yellow'
         )
+
+
+    def easy_game(self, event):
+        self.level = 1
+        self.t_med = 20
+        self.t_box = 20
+        self.Rexp = 10
+        self.w = 0.0002
+        self.i_max = 8
+        self.t0_med = 0
+        self.t0_box = 14
+        self.canv.delete(self.id_level)
+        self.id_level = self.canvas.create_text(730,590,text = 'Difficulty: Easy',font = '28')
+        
+        
+    def medium_game(self, event):
+        self.level = 2
+        self.t_med = 30000
+        self.t_box = 30000
+        self.Rexp = 8
+        self.w = 0.002
+        self.i_max = 10
+        self.t0_med = 20000
+        self.t0_box = 14000
+        self.canvas.delete(self.id_level)
+        self.id_level = self.canvas.create_text(730,590,text = 'Difficulty: Medium',font = '28')
+    
+    def hard_game(self, event):
+        self.level = 3
+        self.t_med = 40000
+        self.t_box = 40000
+        self.Rexp = 6
+        self.w = 0.008
+        self.i_max = 14
+        self.t0_med = 25000
+        self.t0_box = 30000
+        self.canvas.delete(self.id_level)
+        self.id_level = self.canvas.create_text(730,590,text = 'Difficulty: Hard',font = '28')
+          
+    def ultrahard_game(self, event):
+        self.level = 4
+        self.t_med = 50000
+        self.t_box = 50000
+        self.Rexp = 4
+        self.w = 0.015
+        self.i_max = 16
+        self.t0_med = 25000
+        self.t0_box = 30000
+        self.canvas.delete(self.id_level)
+        self.id_level = self.canvas.create_text(730,590,text = 'Difficulty: Ultrahard',font = '28')
 
 
     def start(self):
@@ -546,8 +600,22 @@ class BattleField(tk.Canvas):
         self.id_hp_percents = self.create_text(25,90,text = str(self.player.hp) + '%',font = '28')
         #self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
         
+                 
+    def ultrahard_game(self, event):
+        self.player.ultrahard_game(event) 
         
-        
+    def hard_game(self, event):
+        self.player.hard_game(event)
+    
+    def medium_game(self, event):
+        self.player.medium_game(event)
+          
+    def easy_game(self, event):
+        self.player.easy_game(event)
+
+
+ 
+ 
     def start(self, event):
         global balls, enemys, boxes, medes
         self.delete(self.screen1)
@@ -805,7 +873,9 @@ class MainFrame(tk.Frame):
         self.buttom_ultrahard.place_configure(x=10, y=480)
         self.buttom_ultrahard.bind("<Button-1>", self.ultrahard_game)
      
-        
+#НАДО СДЕЛАТЬ ПО АНАЛОГИИ С РЕСТАРТОМ, ЛИБО КАК С NEW_GAME    
+                                                                
+         
     def ultrahard_game(self, event):
         self.battlefield.ultrahard_game(event) 
         
@@ -818,6 +888,7 @@ class MainFrame(tk.Frame):
     def easy_game(self, event):
         self.battlefield.easy_game(event)
     
+# ________________________________________________________________
     
     def restart(self, event):
         self.battlefield.trigger == 1
