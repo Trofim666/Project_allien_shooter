@@ -12,7 +12,7 @@ yc = 325
 dt = 1
 a = 200
 R = 300
-name = None
+
 
 enemys=[]
 enemys2 = []
@@ -20,8 +20,6 @@ grenades=[]
 balls=[]
 boxes = []
 medes = []
-scores = []
-text = None
 
 def pass_event():
     pass
@@ -568,7 +566,6 @@ class BattleField(tk.Canvas):
         self.k_func = 0
         self.trigger = 0
         self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
-        self.max = None
         
         self.all_points = 0
         self.id_points = self.create_text(30,30,text = 'Score:' + str(self.all_points),font = '28')
@@ -591,14 +588,14 @@ class BattleField(tk.Canvas):
     
     def easy_game(self, event):
         self.player.level = 1
-        self.player.t_med = 10
-        self.player.t_box = 10
+        self.player.t_med = 20
+        self.player.t_box = 20
         self.player.Rexp = 10
-        self.player.w = 0.004
+        self.player.w = 0.0002
         self.player.i_max = 8
         self.player.t_med = 0
         self.player.t_box = 14
-        self.player.canvas.delete(self.player.id_level)
+        self.player.canv.delete(self.player.id_level)
         self.player.id_level = self.player.canvas.create_text(730,590,text = 'Difficulty: Easy',font = '28')
         
         
@@ -666,6 +663,7 @@ class BattleField(tk.Canvas):
             boxes = []
 
         self.trigger = 0
+        self.score = 0
         
         self.player.y = yc
         self.player.x = xc
@@ -710,7 +708,7 @@ class BattleField(tk.Canvas):
 
 
     def check_minus_hp(self):
-        global enemys, enemys2, scores, text
+        global enemys
         for e in enemys:
             if (e['x'] - self.player.x)**2 + (e['y'] - self.player.y)**2 <= (self.player.R1 + e['r'])**2:
                 self.player.hp -= 1
@@ -734,9 +732,8 @@ class BattleField(tk.Canvas):
             self.trigger = 1
             self.player.stop()
             self.dedected_restart = False
-            scores.append(self.all_points)
-            self.max = max(scores)
-            open('Player_score.txt','w').write(name + ', ваш лучший результат:  ' + str(self.max) + ' очков!')
+            self.score = self.all_points
+            open('Player_score.txt','w').write(name + ':' + str(self.score))
 
     def get_root(self):
         root = self.master
@@ -1017,13 +1014,18 @@ class App(tk.Tk):
         self.main_frame = MainFrame(self.master)
         self.main_frame.pack(fill=tk.BOTH, expand=1)
 
-    def start_game(self, event):    
+    def start_game(self, event):
+        
+
         self.main_frame.start_game(event)
 
-print('Введите имя игрока:')
-name = input()
+#    def restart(self, event):
+#       self.main_frame.restart(event)
     
 app = App()
+print('Введите имя игрока:')
+name = input()
 app.start_game("<Button-1>")
 #app.restart("<Button-1>")
 app.mainloop()
+
