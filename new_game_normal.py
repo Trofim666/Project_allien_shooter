@@ -297,8 +297,8 @@ class Player():
     def move_right(self, event):  
         #global k_x, k_y
 
-        self.vx+=-self.F*self.k_x/self.m
-        self.vy+=self.F*self.k_y/self.m
+        self.vx+=-self.F*self.k_y/self.m
+        self.vy+=self.F*self.k_x/self.m
 
         self.set_coords1()
         self.set_coords2()
