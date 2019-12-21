@@ -7,13 +7,12 @@ import time
 
 WINDOW_SIZE = (800, 650)
 
-w = 0.002
 xc = 400
 yc = 325
 dt = 1
 a = 200
 R = 300
-
+name = None
 
 enemys=[]
 enemys2 = []
@@ -21,6 +20,8 @@ grenades=[]
 balls=[]
 boxes = []
 medes = []
+scores = []
+text = None
 
 def pass_event():
     pass
@@ -70,11 +71,12 @@ class Grenade():
     def __init__(self, canvas, x, y):
 
         self.canvas = canvas
+        self.time = time
         self.r = 3
         self.bangtime = 4
         self.x = x
         self.y = y
-        self.Rexp = 3
+        self.Rexp = 5
         self.live = 40
 
         self.vx = 10
@@ -106,20 +108,20 @@ class Grenade():
         self.set_coords()
         
     
-    def blowup(self):
-        for i in range(self.bangtime):
+    """"def blowup(self):
+        for i in range(2):
             self.r+=self.Rexp
-            self.boom = self.canvas.create_oval(
+            boom = self.canvas.create_oval(
                 self.x - self.r,
                 self.y - self.r,
                 self.x + self.r,
                 self.y + self.r,
                 fill='orange'
             )
-            
-            time.sleep(0.006)
-            self.canvas.delete(self.boom)
             self.canvas.update()
+            self.time.sleep(0.6)
+            self.canvas.delete(boom)
+            self.canvas.update()"""
 
 
 class Player():
@@ -128,7 +130,12 @@ class Player():
         #self.game = Game()
 
         self.canvas = canvas
-
+        self.w = 0.002
+        
+        self.id_level = self.canvas.create_text(730,590,text = 'Difficulty: Default',font = '28')
+        
+        self.i_max = 8
+        
         self.boundv = 0.1
 
         self.x = xc
@@ -276,8 +283,8 @@ class Player():
         #cosa =(self.x-self.xc)/math.sqrt( (self.x-self.xc)**2 + (self.y-self.yc)**2  ) 
         #self.ax = self.F*k_x/self.m + k_x * 2*w*self.vy + w**2*(self.x-self.xc)
         #self.ay = self.F*k_y/self.m + k_y * 2*w*self.vx + w**2*(self.y-self.yc)
-        self.ax =  -2*w*self.vy + (w**2)*(self.x-xc)
-        self.ay =  2*w*self.vx +(w**2)*(self.y-yc)
+        self.ax =  -2*self.w*self.vy + (self.w**2)*(self.x-xc)
+        self.ay =  2*self.w*self.vx +(self.w**2)*(self.y-yc)
         self.vx +=self.ax*dt 
         self.vy +=self.ay*dt
         self.v = math.sqrt(self.vx**2 + self.vy**2)
@@ -308,8 +315,8 @@ class Player():
     def move_left(self, event):
         #global k_x, k_y
 
-        self.vx+=self.F*self.k_x/self.m
-        self.vy+=-self.F*self.k_y/self.m
+        self.vx+=self.F*self.k_y/self.m
+        self.vy+=-self.F*self.k_x/self.m
 
         self.set_coords1()
         self.set_coords2()
@@ -338,7 +345,9 @@ class Player():
         self.set_coords2()
         self.set_coords3()
 
-
+    def pass_event(self, event):
+        pass
+    
     def new_box(self):
         global boxes
         if (self.x_box - xc)**2 + (self.y_box - yc)**2 <= a**2:
@@ -380,7 +389,21 @@ class Player():
             self.id_box_time = self.canvas.create_text(725,110,text = '00:00', font = '32')
             self.new_box()
 
+    def stop(self):
+        self.unbind_all()
+    
+    def unbind_all(self):
+        root = self.canvas.get_root()
 
+        root.bind('<Right>', self.pass_event)    
+        root.bind('<Left>', self.pass_event)
+        root.bind('<Up>', self.pass_event)
+        root.bind('<Down>', self.pass_event)
+
+        root.bind('<Motion>', self.pass_event)
+        root.bind('<Button-1>', self.pass_event)
+        root.bind('<Button-3>', self.pass_event)
+    
     def bind_all(self):
         root = self.canvas.get_root()
         root.bind('<Motion>', self.targetting)
@@ -394,27 +417,31 @@ class Player():
 
 class Enemy():
     def __init__(self, canvas):
-        
-        
-        
+              
         self.x = rnd(100, 700)
         self.y = rnd(100, 500)
         self.r = rnd(10, 15)
+        self.w = 0.005
+        self.e_max = 5
         
         self.x2 = rnd(100, 700)
         self.y2 = rnd(100, 500)
         self.r2 = rnd(10, 15)
 
-        self.vx2 = rnd(-1, 1)
-        self.vy2 = rnd(-1, 1)
+        #self.vx2 = rnd(-1, 1)
+        #self.vy2 = rnd(-1, 1)
         
         
-        self.vx = rnd(-6, 6)
-        self.vy = rnd(-6, 6)
-
-        self.num_enemys = 8
+        #self.vx = rnd(-6, 6)
+        #self.vy = rnd(-6, 6)
         
-        self.num_enemys2 = 3
+        
+        self.vx2 = 0
+        self.vy2 = 0
+        
+        
+        self.vx = 0
+        self.vy = 0
         
         self.enemys = 0
         
@@ -422,7 +449,11 @@ class Enemy():
 
         self.canvas = canvas
 
-
+    
+    def define_max_num(self, P):
+        self.e_max = P.i_max
+        self.w = P.w
+    
     def get_r_vector_x(self, x, y):
         self.length_vector = sqrt((xc-x)**2 + (yc-y)**2)
         self.radius_vector_x = (xc-x) / self.length_vector
@@ -497,24 +528,26 @@ class Enemy():
 
 
     def new_enemy(self):
-            if (self.x - xc)**2 + (self.y - yc)**2 >= a**2 and (self.x - xc)**2 + (self.y - yc)**2 <= (R-40)**2 and self.enemys < self.num_enemys:
-                self.id_ = self.canvas.create_oval(self.x - self.r, self.y - self.r, self.x + self.r, self.y + self.r,fill = 'black', width=0, activefill = 'green')
-                self.enemy={'id': self.id_, 'x': self.x, 'y': self.y, 'r': self.r, 'vx': self.vx, 'vy': self.vy}
-                self.enemys+=1
-                enemys.append(self.enemy)
+        
+        if (self.x - xc)**2 + (self.y - yc)**2 >= a**2 and (self.x - xc)**2 + (self.y - yc)**2 <= (R-40)**2 and self.enemys < self.e_max:
+            self.id_ = self.canvas.create_oval(self.x - self.r, self.y - self.r, self.x + self.r, self.y + self.r,fill = 'black', width=0, activefill = 'green')
+            self.enemy={'id': self.id_, 'x': self.x, 'y': self.y, 'r': self.r, 'vx': self.vx, 'vy': self.vy}
+            self.enemys+=1
+            enemys.append(self.enemy)
                 
     def new_enemy2(self):
-            if (self.x2 - xc)**2 + (self.y2 - yc)**2 >= a**2 and (self.x2 - xc)**2 + (self.y2 - yc)**2 <= (R-40)**2 and self.enemys2 < self.num_enemys2:
-                self.id2 = self.canvas.create_oval(self.x2 - self.r2, self.y2 - self.r2, self.x2 + self.r2, self.y2 + self.r2,fill = 'blue', width=0, activefill = 'green')
-                self.enemy2={'id': self.id2, 'x': self.x2, 'y': self.y2, 'r': self.r2, 'vx': self.vx2, 'vy': self.vy2}
-                self.enemys2+=1
-                enemys2.append(self.enemy2)
+            
+        if (self.x2 - xc)**2 + (self.y2 - yc)**2 >= a**2 and (self.x2 - xc)**2 + (self.y2 - yc)**2 <= (R-40)**2 and self.enemys2 < self.e_max:
+            self.id2 = self.canvas.create_oval(self.x2 - self.r2, self.y2 - self.r2, self.x2 + self.r2, self.y2 + self.r2,fill = 'blue', width=0, activefill = 'green')
+            self.enemy2={'id': self.id2, 'x': self.x2, 'y': self.y2, 'r': self.r2, 'vx': self.vx2, 'vy': self.vy2}
+            self.enemys2+=1
+            enemys2.append(self.enemy2)
 
 
     def motion(self):
         for e in enemys:
-            e['vx']+= ( -2*w*e['vy'] + (w**2)*(-xc + e['x'])  )*dt
-            e['vy']+= ( +2*w*e['vx'] + (w**2)*(-yc + e['y'])  )*dt
+            e['vx']+= ( -2*self.w*e['vy'] + (self.w**2)*(-xc + e['x'])  )*dt
+            e['vy']+= ( +2*self.w*e['vx'] + (self.w**2)*(-yc + e['y'])  )*dt
             if (xc - e['x'])**2 + (yc - e['y'])**2 >= (R-e['r'])**2:
                 v_x = self.change_velocity_vx(e['vx'], e['vy'], e['x'], e['y'])
                 v_y = self.change_velocity_vy(e['vx'], e['vy'], e['x'], e['y'])
@@ -540,8 +573,15 @@ class BattleField(tk.Canvas):
     def __init__(self, master):
         super().__init__(master, background='pink')
 
+        self.dedected_restart = False
         self.k_func = 0
-
+        
+        self.trigger = 0
+        self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
+        self.max = None
+        self.r = 5
+        #self.canvas = canvas#почему нельзя вызвать canvas
+        
         self.all_points = 0
         self.id_points = self.create_text(30,30,text = 'Score:' + str(self.all_points),font = '28')
 
@@ -560,10 +600,62 @@ class BattleField(tk.Canvas):
         self.id_hp_percents = self.create_text(25,90,text = str(self.player.hp) + '%',font = '28')
         #self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
 
-    def start(self):
-        global balls, enemys, boxes, medes
+    
+    def easy_game(self, event):
+        self.player.level = 1
+        self.player.t_med = 10
+        self.player.t_box = 10
+        self.player.Rexp = 10
+        self.player.w = 0.004
+        self.player.i_max = 8
+        self.player.t_med = 0
+        self.player.t_box = 14
+        self.player.canvas.delete(self.player.id_level)
+        self.player.id_level = self.player.canvas.create_text(730,590,text = 'Difficulty: Easy',font = '28')
+        
+        
+    def medium_game(self, event):
+        self.player.level = 2
+        self.player.t_med = 30
+        self.player.t_box = 30
+        self.player.Rexp = 8
+        self.player.w = 0.002
+        self.player.i_max = 10
+        self.player.t0_med = 20
+        self.player.t0_box = 14
+        self.player.canvas.delete(self.player.id_level)
+        self.player.id_level = self.player.canvas.create_text(730,590,text = 'Difficulty: Medium',font = '28')
+    
+    def hard_game(self, event):
+        self.player.level = 3
+        self.player.t_med = 40
+        self.player.t_box = 40
+        self.player.Rexp = 6
+        self.player.w = 0.008
+        self.player.i_max = 14
+        self.player.t0_med = 25
+        self.player.t0_box = 30
+        self.player.canvas.delete(self.player.id_level)
+        self.player.id_level = self.player.canvas.create_text(730,590,text = 'Difficulty: Hard',font = '28')
+          
+    def ultrahard_game(self, event):
+        self.player.level = 4
+        self.player.t_med = 50
+        self.player.t_box = 50
+        self.player.Rexp = 4
+        self.player.w = 0.015
+        self.player.i_max = 16
+        self.player.t0_med = 25
+        self.player.t0_box = 30
+        self.player.canvas.delete(self.player.id_level)
+        self.player.id_level = self.player.canvas.create_text(730,590,text = 'Difficulty: Ultrahard',font = '28')
+    
+    
+    
+    def start(self, event):
+        global balls, enemys, boxes, medes, enemys2
 
-        self.screen1 = self.create_text(400, 300, text='', font = "Times 100 italic bold")
+        self.delete(self.screen1)
 
         for bb in balls:
             self.delete(bb.id)
@@ -572,6 +664,10 @@ class BattleField(tk.Canvas):
         for e in enemys:
             self.delete(e['id'])
             enemys = []
+            
+        for e in enemys2:
+            self.delete(e['id'])
+            enemys2 = []
 
         for m in medes:
             self.delete(m['id'])
@@ -581,6 +677,8 @@ class BattleField(tk.Canvas):
             self.delete(bx['id'])
             boxes = []
 
+        self.trigger = 0
+        
         self.player.y = yc
         self.player.x = xc
         self.player.vx = 0
@@ -611,15 +709,20 @@ class BattleField(tk.Canvas):
 
         self.player.start()
         self.enemy = Enemy(self)
+        self.update()
 
         '''for i in range(self.enemy.num_enemys):
             self.enemy.new_enemy()
             self.enemy.x = rnd(100, 700)
             self.enemy.y = rnd(100, 500)'''
 
+    def change_trigger(self, event):
+        self.dedected_restart = True
+
+
 
     def check_minus_hp(self):
-        global enemys
+        global enemys, enemys2, scores, text
         for e in enemys:
             if (e['x'] - self.player.x)**2 + (e['y'] - self.player.y)**2 <= (self.player.R1 + e['r'])**2:
                 self.player.hp -= 1
@@ -637,11 +740,15 @@ class BattleField(tk.Canvas):
                 self.id_hp = self.create_rectangle(10, 45, self.player.x_hp, 75, fill='green', width = 2) 
                 
                 
-        if self.player.hp <= 0 or (self.player.x - xc)**2 + (self.player.y - yc)**2 >= R**2:
+        if self.player.hp <= 0 or (self.player.x - xc)**2 + (self.player.y - yc)**2 >= R**2 :
             #self.itemconfig(self.screen1, text='GAME OVER', font = "Times 100 italic bold")
             self.screen1 = self.create_text(400, 300, text='Game Over', font = "Times 100 italic bold")
-
-
+            self.trigger = 1
+            self.player.stop()
+            self.dedected_restart = False
+            scores.append(self.all_points)
+            self.max = max(scores)
+            open('Player_score.txt','w').write(name + ', ваш лучший результат:  ' + str(self.max) + ' очков!')
 
     def get_root(self):
         root = self.master
@@ -649,12 +756,11 @@ class BattleField(tk.Canvas):
             root = root.master
         return root
 
-    def game_over(self):
-        self.screen1 = self.create_text(400, 300, text='Game Over', font = "Times 100 italic bold")
-        self.after(1500, self.start())
-
 
     def update(self):  # put root.after here
+        if self.trigger == 1:
+            return
+        
         for b in balls:
             b.move()
             for k, e in enumerate(enemys):   
@@ -727,7 +833,20 @@ class BattleField(tk.Canvas):
 
             for k, e in enumerate(enemys):   
                 if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.r+e['r'])**2 :
-                    g.blowup()
+                    #g.blowup()#как создать отдельное время лишь только для бомб, когда прописываешь time.sleep останавливается все
+                    for i in range(g.bangtime):
+                        g.r+=g.Rexp
+                        boom = self.create_oval(
+                        g.x - g.r,
+                        g.y - g.r,
+                        g.x + g.r,
+                        g.y + g.r,
+                        fill='orange'
+                        )
+                        tk.Canvas.update(self)#xz
+                        time.sleep(0.06)
+                        self.delete(boom)
+                        
                     self.delete(e['id'])
                     self.delete(g.id)
                     
@@ -752,22 +871,84 @@ class BattleField(tk.Canvas):
                         #clip_r5[r_01].play()
                         self.all_points +=5
                     for kk, e in enumerate(enemys):   
-                        if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.Rexp*g.bangtime)**2 :
+                        if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.Rexp*g.bangtime+g.r)**2 :
                             self.delete(e['id'])
-                            g.blowup()
+                            #g.blowup()
                             self.all_points +=1
                             self.enemy.enemys-=1
                             del enemys[kk]
                     for kk, e in enumerate(enemys2):   
-                        if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.Rexp*g.bangtime)**2 :
+                        if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.Rexp*g.bangtime+g.r)**2 :
                             self.delete(e['id'])
-                            g.blowup()
+                            #g.blowup()
                             self.all_points +=1
                             self.enemy.enemys2-=1
                             del enemys2[kk]
                     for bb in enemys:
-                        bb['vx']+= self.deltav*R*(bb['x'] - g.x)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.02
-                        bb['vy']+= self.deltav*R*(bb['y'] - g.y)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.02
+                        bb['vx']+= self.deltav*R*(bb['x'] - g.x)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
+                        bb['vy']+= self.deltav*R*(bb['y'] - g.y)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
+                    g.x = 0
+                    g.y = 0
+                    g.vx = 0
+                    g.vy = 0
+                        
+                        
+            for k, e in enumerate(enemys2):   
+                if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.r+e['r'])**2 :
+                    #g.blowup()#как создать отдельное время лишь только для бомб, когда прописываешь time.sleep останавливается все
+                    for i in range(g.bangtime):
+                        g.r+=g.Rexp
+                        boom = self.create_oval(
+                        g.x - g.r,
+                        g.y - g.r,
+                        g.x + g.r,
+                        g.y + g.r,
+                        fill='orange'
+                        )
+                        tk.Canvas.update(self)#xz
+                        time.sleep(0.06)
+                        self.delete(boom)
+                        
+                    self.delete(e['id'])
+                    self.delete(g.id)
+                    
+                    self.streak+=1
+
+                    if self.streak==1:
+                        #clip_10[r_0].play()
+                        self.all_points +=1
+                    elif self.streak==2:
+                        #clip_r[0].play()
+                        self.all_points +=2
+                    elif self.streak==3:
+                        #clip_r[1].play()
+                        self.all_points +=3
+                    elif self.streak==4:
+                        #clip_r[2].play()
+                        self.all_points +=4
+                    elif self.streak==5:
+                        #clip_r[3].play()
+                        self.all_points +=5
+                    elif self.streak>=5:
+                        #clip_r5[r_01].play()
+                        self.all_points +=5
+                    for kk, e in enumerate(enemys):   
+                        if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.Rexp*g.bangtime+g.r)**2 :
+                            self.delete(e['id'])
+                            #g.blowup()
+                            self.all_points +=1
+                            self.enemy.enemys-=1
+                            del enemys[kk]
+                    for kk, e in enumerate(enemys2):   
+                        if (g.x-e['x'])**2 + (g.y-e['y'])**2 <= (g.Rexp*g.bangtime+g.r)**2 :
+                            self.delete(e['id'])
+                            #g.blowup()
+                            self.all_points +=1
+                            self.enemy.enemys2-=1
+                            del enemys2[kk]
+                    for bb in enemys:
+                        bb['vx']+= self.deltav*R*(bb['x'] - g.x)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
+                        bb['vy']+= self.deltav*R*(bb['y'] - g.y)/( (bb['x'] - g.x)**2 + (bb['y'] - g.y)**2 )*0.2
                     g.x = 0
                     g.y = 0
                     g.vx = 0
@@ -793,16 +974,24 @@ class BattleField(tk.Canvas):
             self.enemy.new_enemy2()
             self.enemy.x2 = rnd(100, 700)
             self.enemy.y2 = rnd(100, 500)
-            self.enemy.r2 = rnd(10, 15)
+            self.enemy.r2 = rnd(20, 25)
         
         self.enemy.motion()
         self.enemy.motion2(self.player)
+        self.enemy.define_max_num(self.player)
         
         self.enemy.vx = rnd(-2, 2)
         self.enemy.vy = rnd(-2, 2)
         
         self.enemy.vx2 = rnd(-1, 1)
         self.enemy.vy2 = rnd(-1, 1)
+        
+        
+        #self.enemy.vx = 0
+        #self.enemy.vy = 0
+        
+        #self.enemy.vx2 = 0
+        #self.enemy.vy2 = 0
 
         self.player.move()
         self.player.acceleration()
@@ -841,24 +1030,77 @@ class BattleField(tk.Canvas):
                     del medes[k]
 
         self.k_func+=20
-
+        #self.update()
         self.after(20, self.update)
 
 
 class MainFrame(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
-
+        
+        self.num_clicks = 0
+        
         self.battlefield = BattleField(self)
         self.battlefield.pack(fill=tk.BOTH, expand=1)
 
-        '''self.buttom_new_game = tk.Button(self, text = 'New Game',background='blue',foreground='white', width = 10, height = 1)
+        self.buttom_new_game = tk.Button(self, text = 'New Game',background='blue',foreground='white', width = 10, height = 1)
         self.buttom_new_game.place_configure(x=550, y=25)
-        self.buttom_new_game.bind("<Button-1>", self.start_game)'''
+        self.buttom_new_game.bind("<Button-1>", self.start_game)
 
-    def start_game(self): 
-        self.battlefield.start()
-        self.battlefield.update()
+#        self.buttom_restart = tk.Button(self, text = 'Restart',background='blue',foreground='white', width = 10, height = 1)
+#        self.buttom_restart.place_configure(x=580, y=55)
+#        self.buttom_restart.bind("<Button-1>", self.restart)
+      
+             
+        self.buttom_easy = tk.Button(self, text = 'Easy', background='lime', foreground='black', width = 10, height = 1)
+        self.buttom_easy.place_configure(x=10, y=600)
+        self.buttom_easy.bind("<Button-1>", self.easy_game)        
+
+        self.buttom_medium = tk.Button(self, text = 'Medium',background='gold',foreground='black', width = 10, height = 1)
+        self.buttom_medium.place_configure(x=10, y=560)
+        self.buttom_medium.bind("<Button-1>", self.medium_game)
+                
+        self.buttom_hard = tk.Button(self, text = 'Hard',background='orangered',foreground='black', width = 10, height = 1)
+        self.buttom_hard.place_configure(x=10, y=520)
+        self.buttom_hard.bind("<Button-1>", self.hard_game)
+
+        self.buttom_ultrahard = tk.Button(self, text = 'UltraHard',background='maroon',foreground='black', width = 10, height = 1)
+        self.buttom_ultrahard.place_configure(x=10, y=480)
+        self.buttom_ultrahard.bind("<Button-1>", self.ultrahard_game)
+     
+#НАДО СДЕЛАТЬ ПО АНАЛОГИИ С РЕСТАРТОМ, ЛИБО КАК С NEW_GAME    
+                                                                
+         
+    def ultrahard_game(self, event):
+        if self.battlefield.trigger == 1:
+            self.battlefield.start(event)
+            self.battlefield.ultrahard_game(event) 
+        
+    def hard_game(self, event):
+        if self.battlefield.trigger == 1:
+            self.battlefield.start(event)
+            self.battlefield.hard_game(event)
+    
+    def medium_game(self, event):
+        if self.battlefield.trigger == 1:
+            self.battlefield.start(event)
+            self.battlefield.medium_game(event)
+          
+    def easy_game(self, event):
+        if self.battlefield.trigger == 1:
+            self.battlefield.start(event)
+            self.battlefield.easy_game(event)
+    
+# ________________________________________________________________
+    
+#    def restart(self, event):
+#        self.battlefield.change_trigger(event)    
+#        self.battlefield.start(event)
+        
+    def start_game(self, event):
+        if self.battlefield.trigger == 1 or self.num_clicks == 0:
+            self.battlefield.start(event)
+            self.num_clicks = 1
 
 
 class App(tk.Tk):
@@ -869,9 +1111,13 @@ class App(tk.Tk):
         self.main_frame = MainFrame(self.master)
         self.main_frame.pack(fill=tk.BOTH, expand=1)
 
-    def start_game(self):
-        self.main_frame.start_game()
+    def start_game(self, event):    
+        self.main_frame.start_game(event)
 
+print('Введите имя игрока:')
+name = input()
+    
 app = App()
-app.start_game()
+app.start_game("<Button-1>")
+#app.restart("<Button-1>")
 app.mainloop()

@@ -304,7 +304,7 @@ class Grenade():
                 self.y + self.r0,
                 fill='orange'
             )
-            canv.update()
+            #canv.update()
             time.sleep(0.06)
             canv.delete(boom)
 
